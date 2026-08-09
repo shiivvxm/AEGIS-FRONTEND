@@ -39,7 +39,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
-import { getProfile, saveProfile } from "@/lib/profile";
+import { getProfile, saveProfile, getDisplayName } from "@/lib/profile";
 import ProfileHeader from "@/components/profile/profile-header";
 
 export const Route = createFileRoute("/citizen")({
@@ -185,14 +185,6 @@ function CitizenPortal() {
     toast.info("SOS Activation Cancelled. No emergency dispatched.");
   };
 
-  if (isLoading || !isAuthenticated || user?.role !== "citizen") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-6 w-6 animate-ping bg-[#E63946] rounded-full" />
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (!listening) return;
     const phrases = [
@@ -213,6 +205,14 @@ function CitizenPortal() {
     }, 1200);
     return () => clearInterval(id);
   }, [listening]);
+
+  if (isLoading || !isAuthenticated || user?.role !== "citizen") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-ping bg-[#E63946] rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <CitizenShell
@@ -292,7 +292,7 @@ function HomeView({
 }) {
   const { user } = useAuth();
   const profile = getProfile("citizen");
-  const name = profile.name || user?.name || "Citizen";
+  const name = getDisplayName("citizen", user);
 
   const [activeModal, setActiveModal] = useState<"first-aid" | "hospitals" | "chat" | "share" | null>(null);
   const [selectedGuide, setSelectedGuide] = useState<string | null>(null);
@@ -908,7 +908,7 @@ function HistoryView() {
 function ProfileView() {
   const { user } = useAuth();
   const profile = getProfile("citizen");
-  const name = profile.name || user?.name || "Citizen";
+  const name = getDisplayName("citizen", user);
 
   const [shareConditions, setShareConditions] = useState(true);
   const [shareAllergies, setShareAllergies] = useState(true);

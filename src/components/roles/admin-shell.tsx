@@ -45,7 +45,7 @@ const TABS: { id: AdminTab; label: string; icon: LucideIcon }[] = [
 ];
 
 import { useAuth } from "@/hooks/use-auth";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 export function AdminShell({
   activeTab,
@@ -61,7 +61,7 @@ export function AdminShell({
   const { user } = useAuth();
   const profile = getProfile("admin");
   const region = profile.regionZone || "Delhi NCR Emergency Network";
-  const name = profile.officerName || user?.name || "Grid Admin";
+  const name = getDisplayName("admin", user);
 
   return (
     <div className="min-h-screen bg-[#F8F9FB]">

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/volunteer")({
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 function VolunteerPortal() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -258,7 +258,7 @@ function VolunteerPortal() {
 
       {tab === "profile" && (() => {
         const profile = getProfile("volunteer");
-        const name = profile.name || user?.name || "Volunteer";
+        const name = getDisplayName("volunteer", user);
         const subtitle = `VOL-${user?.id?.substr(-4).toUpperCase() || "202"} · ${profile.skillRank || "Gold Responder"}`;
 
         return (

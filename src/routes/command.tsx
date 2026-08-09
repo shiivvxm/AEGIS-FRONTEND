@@ -96,7 +96,7 @@ import {
 } from "@/lib/mock-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/command")({
@@ -1943,7 +1943,7 @@ function AdminPortal() {
       ═══════════════════════════════════════════════════════════════ */}
       {tab === "profile" && (() => {
         const profile = getProfile("admin");
-        const name = profile.officerName || user?.name || "Grid Admin";
+        const name = getDisplayName("admin", user);
         const subtitle = `Clearance: ${profile.clearanceLevel || "Level 3"} · ID: ${profile.employeeId || "N/A"}`;
         return (
           <div className="space-y-4">

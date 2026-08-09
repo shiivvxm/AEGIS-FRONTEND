@@ -35,10 +35,20 @@ const phoneLoginSchema = z.object({
 type EmailLoginData = z.infer<typeof emailLoginSchema>;
 type PhoneLoginData = z.infer<typeof phoneLoginSchema>;
 
-const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.ElementType; color: string; border: string; bg: string }[] = [
+const PORTAL_ROLES: {
+  key: Role;
+  title: string;
+  shortLabel: string;
+  tagline: string;
+  icon: React.ElementType;
+  color: string;
+  border: string;
+  bg: string;
+}[] = [
   {
     key: "citizen",
     title: "Citizen SOS",
+    shortLabel: "Citizen",
     tagline: "Instant dispatch, emergency alerts, and voice SOS.",
     icon: HeartPulse,
     color: "text-[#E63946]",
@@ -47,7 +57,8 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
   },
   {
     key: "volunteer",
-    title: "First Responder",
+    title: "Volunteer",
+    shortLabel: "Volunteer",
     tagline: "Nearby alerts, first-aid support, and skill maps.",
     icon: Users,
     color: "text-purple-600",
@@ -57,6 +68,7 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
   {
     key: "ambulance",
     title: "Ambulance Cockpit",
+    shortLabel: "Ambulance",
     tagline: "Live routing, vitals streaming, and priority signals.",
     icon: Ambulance,
     color: "text-amber-600",
@@ -66,6 +78,7 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
   {
     key: "hospital",
     title: "Hospital Trauma Hub",
+    shortLabel: "Hospital",
     tagline: "ICU bed status, ER bays sync, and team prepares.",
     icon: Building2,
     color: "text-blue-600",
@@ -75,6 +88,7 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
   {
     key: "traffic",
     title: "Traffic Control",
+    shortLabel: "Traffic",
     tagline: "Live city traffic, emergency corridors, and CCTV feeds.",
     icon: TrafficCone,
     color: "text-emerald-600",
@@ -84,6 +98,7 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
   {
     key: "admin",
     title: "Operations Grid",
+    shortLabel: "Operator",
     tagline: "Citywide heatmaps, overrides, and analytics.",
     icon: Shield,
     color: "text-slate-700",
@@ -286,7 +301,7 @@ function LoginPortal() {
                       title={role.title}
                     >
                       <Icon className={`h-5 w-5 ${isSelected ? "scale-110" : "text-gray-400 group-hover:text-gray-600"}`} />
-                      <span className="text-[9px] font-bold mt-1.5 truncate max-w-full leading-none">{role.title.split(" ")[0]}</span>
+                      <span className="text-[9px] font-bold mt-1.5 leading-tight text-center break-words max-w-full px-0.5">{role.shortLabel}</span>
                     </button>
                   );
                 })}

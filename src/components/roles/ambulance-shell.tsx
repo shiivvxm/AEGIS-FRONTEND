@@ -17,7 +17,7 @@ const TABS: { id: AmbulanceTab; label: string; icon: LucideIcon }[] = [
 ];
 
 import { useAuth } from "@/hooks/use-auth";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 export function AmbulanceShell({
   activeTab,
@@ -32,7 +32,7 @@ export function AmbulanceShell({
 }) {
   const { user } = useAuth();
   const profile = getProfile("ambulance");
-  const driverName = profile.driverName || profile.operatorName || user?.name || "EMT Driver";
+  const driverName = getDisplayName("ambulance", user);
   const unitCode = profile.ambulanceNumber || "Unit A-1083";
   const vehicleType = profile.vehicleType?.includes("ALS") || profile.vehicleType?.includes("Advanced") ? "ALS" : "BLS";
 

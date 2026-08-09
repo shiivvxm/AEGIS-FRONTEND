@@ -86,6 +86,30 @@ function normalizeProfile(role: string, profile: Profile): Profile {
   return profile;
 }
 
+/** Resolves the signed-in user's display name from session first, then saved profile fields. */
+export function getDisplayName(role: string, sessionUser?: { name?: string } | null): string {
+  const sessionName = sessionUser?.name?.trim();
+  if (sessionName) return sessionName;
+
+  const profile = getProfile(role);
+  const candidates = [
+    profile.fullName,
+    profile.name,
+    profile.driverName,
+    profile.operatorName,
+    profile.officerName,
+    profile.hospitalName,
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate && String(candidate).trim()) {
+      return String(candidate).trim();
+    }
+  }
+
+  return "User";
+}
+
 export function getProfile(role: string): Profile {
   try {
     const userId = getUserId();

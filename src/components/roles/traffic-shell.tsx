@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { AegisBrand } from "@/components/design-system";
 import { Avatar } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 export type TrafficTab = "map" | "cctv" | "corridors" | "incidents" | "coordination" | "profile";
 
@@ -45,7 +45,7 @@ export function TrafficShell({
 }) {
   const { user, logout } = useAuth();
   const profile = getProfile("traffic");
-  const name = profile.name || profile.officerName || user?.name || "Traffic Control Officer";
+  const name = getDisplayName("traffic", user);
   const badgeId = profile.employeeId || "TRF-9021";
 
   return (

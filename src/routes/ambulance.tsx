@@ -32,7 +32,7 @@ import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/ambulance")({
@@ -393,7 +393,7 @@ function AmbulancePortal() {
       ═══════════════════════════════════════════════════════════════ */}
       {tab === "profile" && (() => {
         const profile = getProfile("ambulance");
-        const name = profile.driverName || profile.operatorName || user?.name || "Vivaan Sharma";
+        const name = getDisplayName("ambulance", user);
 
         return (
           <div className="space-y-4 max-w-lg mx-auto">

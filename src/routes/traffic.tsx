@@ -40,7 +40,7 @@ import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 import {
   cctvCameras,
   generateAmbulances,
@@ -809,7 +809,7 @@ function TrafficPortal() {
       ═══════════════════════════════════════════════════════════════ */}
       {tab === "profile" && (() => {
         const profile = getProfile("traffic");
-        const name = profile.name || profile.officerName || user?.name || "Inspector Rajesh Kumar";
+        const name = getDisplayName("traffic", user);
 
         return (
           <div className="max-w-xl mx-auto space-y-4">

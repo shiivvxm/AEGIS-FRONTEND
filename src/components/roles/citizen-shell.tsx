@@ -16,7 +16,7 @@ const TABS: { id: CitizenTab; label: string; icon: LucideIcon }[] = [
 ];
 
 import { useAuth } from "@/hooks/use-auth";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 export function CitizenShell({
   activeTab,
@@ -31,7 +31,7 @@ export function CitizenShell({
 }) {
   const { user } = useAuth();
   const profile = getProfile("citizen");
-  const name = profile.name || user?.name || "Citizen";
+  const name = getDisplayName("citizen", user);
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -82,7 +82,7 @@ export function CitizenShell({
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-[#F8F9FB] p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-[#F8F9FB] p-6 pb-24 lg:pb-6">{children}</main>
 
         <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[#E5E7EB] bg-white/95 backdrop-blur-md lg:hidden">
           <div className="flex w-full items-stretch justify-around px-2 py-1.5">

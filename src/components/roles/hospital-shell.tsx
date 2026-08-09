@@ -28,7 +28,7 @@ const NAV: { id: HospitalTab; label: string; icon: LucideIcon }[] = [
 ];
 
 import { useAuth } from "@/hooks/use-auth";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 
 export function HospitalShell({
   activeTab,
@@ -43,10 +43,13 @@ export function HospitalShell({
 }) {
   const { user } = useAuth();
   const profile = getProfile("hospital");
-  const hospitalName = profile.hospitalName || user?.name || "Hospital Admin";
+  const hospitalName = profile.hospitalName || user?.name || "Hospital";
   const hospitalType = profile.hospitalType || "Trauma Hub";
+  const operatorName = getDisplayName("hospital", user);
 
-  const initials = hospitalName ? hospitalName.split(" ").map((s) => s[0]).slice(0, 2).join("") : "HA";
+  const initials = operatorName
+    ? operatorName.split(" ").map((s) => s[0]).slice(0, 2).join("")
+    : "HA";
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FB]">

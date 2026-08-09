@@ -2,28 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Activity,
-  AlertCircle,
   AlertTriangle,
   Ambulance,
   Bed,
   BedDouble,
+  Brain,
   Building2,
   CheckCircle2,
   ChevronRight,
   Clock,
   HeartPulse,
-  Info,
   MapPin,
-  MessageSquare,
   Phone,
-  Radio,
-  RefreshCw,
-  Shield,
-  Siren,
-  Sparkles,
   Users,
-  Wrench,
-  XCircle,
 } from "lucide-react";
 import { SectionCard, SeverityBadge, StatCard } from "@/components/design-system";
 import { HospitalShell, type HospitalTab } from "@/components/roles/hospital-shell";
@@ -31,7 +22,7 @@ import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
-import { getProfile } from "@/lib/profile";
+import { getProfile, getDisplayName } from "@/lib/profile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Area,
@@ -176,17 +167,24 @@ function HospitalPortal() {
   const equipmentFactor = 88; // 88% equipment ready
   const staffFactor = 90; // 90% staff on duty
   const readinessScore = Math.round(icuFactor * 0.35 + erFactor * 0.3 + staffFactor * 0.2 + equipmentFactor * 0.15);
+  const earliestEta =
+    incomingCases.length > 0 ? Math.min(...incomingCases.map((c) => c.eta)) : null;
+  const profile = getProfile("hospital");
+  const displayName = getDisplayName("hospital", user);
+  const hospitalLabel = profile.hospitalName || displayName;
 
   const handleAdvanceCaseWorkflow = (caseId: string) => {
     setIncomingCases((prev) =>
       prev.map((c) => {
         if (c.id === caseId) {
           const currentIdx = PREP_WORKFLOW_STEPS.findIndex((s) => s.stage === c.stage);
-          if (currentIdx < PREP_WORKFLOW_STEPS.length - 1) {
-            const nextStage = PREP_WORKFLOW_STEPS[currentIdx + 1].stage;
-            toast.success(`${c.id}: Case workflow advanced to ${PREP_WORKFLOW_STEPS[currentIdx + 1].label}`);
-            return { ...c, stage: nextStage };
+          if (currentIdx >= PREP_WORKFLOW_STEPS.length - 1) {
+            toast.info(`${c.id}: Case workflow is already at the final stage.`);
+            return c;
           }
+          const nextStage = PREP_WORKFLOW_STEPS[currentIdx + 1].stage;
+          toast.success(`${c.id}: Case workflow advanced to ${PREP_WORKFLOW_STEPS[currentIdx + 1].label}`);
+          return { ...c, stage: nextStage };
         }
         return c;
       })
@@ -266,7 +264,9 @@ function HospitalPortal() {
           <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
             <p className="text-[9px] font-bold text-blue-300 uppercase">Incoming Ambulances</p>
             <p className="text-xl font-black text-white mt-0.5">{incomingCases.length}</p>
-            <p className="text-[9px] text-emerald-400 font-bold">Earliest ETA: 4 min</p>
+            <p className="text-[9px] text-emerald-400 font-bold">
+              {earliestEta !== null ? `Earliest ETA: ${earliestEta} min` : "No incoming cases"}
+            </p>
           </div>
 
           <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
@@ -333,6 +333,7 @@ function HospitalPortal() {
                 {incomingCases.map((c) => {
                   const currentPrep = PREP_WORKFLOW_STEPS.find((s) => s.stage === c.stage) ?? PREP_WORKFLOW_STEPS[0];
                   const currentIdx = PREP_WORKFLOW_STEPS.findIndex((s) => s.stage === c.stage);
+                  const isFinalStage = currentIdx >= PREP_WORKFLOW_STEPS.length - 1;
 
                   return (
                     <div
@@ -427,11 +428,15 @@ function HospitalPortal() {
                         <div className="flex gap-2 pt-2">
                           <button
                             type="button"
-                            onClick={() => handleAdvanceWorkflow(c.id)}
-                            className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-xs font-bold text-white transition-colors flex items-center justify-center gap-1.5"
+                            onClick={() => handleAdvanceCaseWorkflow(c.id)}
+                            disabled={isFinalStage}
+                            aria-label={`Advance workflow for case ${c.id}`}
+                            className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-xs font-bold text-white transition-colors flex items-center justify-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            <span>Action: {currentPrep.actionLabel}</span>
-                            <ChevronRight className="h-4 w-4" />
+                            <span>
+                              {isFinalStage ? "Case Admitted & Active" : `Action: ${currentPrep.actionLabel}`}
+                            </span>
+                            {!isFinalStage && <ChevronRight className="h-4 w-4" />}
                           </button>
 
                           <button
@@ -553,7 +558,6 @@ function HospitalPortal() {
                   const isOccupied = i < beds.erOccupied;
                   const isReserved = !isOccupied && i < beds.erOccupied + beds.erReserved;
                   const isCleaning = !isOccupied && !isReserved && i < beds.erOccupied + beds.erReserved + beds.erCleaning;
-                  const isFree = !isOccupied && !isReserved && !isCleaning;
 
                   return (
                     <div
@@ -688,6 +692,113 @@ function HospitalPortal() {
               </div>
             </div>
           </SectionCard>
+        </div>
+      )}
+
+      {tab === "patients" && (
+        <div className="space-y-6">
+          <SectionCard title="Active & Incoming Patients" description="Cases currently in transit or under hospital care">
+            {incomingCases.length === 0 ? (
+              <div className="py-10 text-center space-y-2">
+                <HeartPulse className="mx-auto h-10 w-10 text-blue-600" />
+                <p className="text-sm font-bold text-gray-900">No active patient cases</p>
+                <p className="text-xs text-gray-500">Incoming and admitted patients will appear here.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {incomingCases.map((c) => (
+                  <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4">
+                    <div>
+                      <p className="text-xs font-mono font-black text-gray-900">{c.id}</p>
+                      <p className="text-sm font-bold text-gray-900">{c.type}</p>
+                      <p className="text-xs text-gray-500">{c.victims} victim(s) · {c.location}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <SeverityBadge severity={c.severity} />
+                      <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 text-[10px] font-bold whitespace-nowrap">
+                        {(PREP_WORKFLOW_STEPS.find((s) => s.stage === c.stage) ?? PREP_WORKFLOW_STEPS[0]).label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      )}
+
+      {tab === "analytics" && (
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Readiness Score" value={`${readinessScore}%`} hint="Composite trauma readiness" icon={Activity} accent="medical" />
+            <StatCard label="Incoming Cases" value={incomingCases.length} hint="Active ambulance handovers" icon={Ambulance} accent="warning" />
+            <StatCard label="ICU Utilization" value={`${Math.round((beds.icuOccupied / beds.icuTotal) * 100)}%`} hint={`${beds.icuFree} beds free`} icon={BedDouble} accent="warning" />
+            <StatCard label="ER Utilization" value={`${Math.round((beds.erOccupied / beds.erTotal) * 100)}%`} hint={`${beds.erFree} bays free`} icon={Bed} accent="success" />
+          </div>
+
+          <SectionCard title="Occupancy Trends (24h)" description="ER bays and ICU ward utilization">
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={occupancyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="er" stroke="#2563EB" fill="#2563EB" fillOpacity={0.15} name="ER Bays %" />
+                  <Area type="monotone" dataKey="icu" stroke="#D97706" fill="#D97706" fillOpacity={0.15} name="ICU Beds %" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SectionCard>
+        </div>
+      )}
+
+      {tab === "settings" && (
+        <div className="space-y-6 max-w-2xl">
+          <SectionCard title="Hospital Operations Settings" description="Configure trauma center alerts and capacity reporting">
+            <div className="space-y-4 text-sm">
+              {[
+                { label: "Auto-reserve ICU for critical incoming cases", enabled: true },
+                { label: "Push bed capacity updates to AEGIS grid", enabled: true },
+                { label: "Enable ambulance live telemetry overlay", enabled: true },
+                { label: "Trauma diversion auto-escalation at 90% ER occupancy", enabled: false },
+              ].map((setting) => (
+                <label key={setting.label} className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-slate-50 p-4">
+                  <span className="text-xs font-semibold text-gray-900">{setting.label}</span>
+                  <input
+                    type="checkbox"
+                    defaultChecked={setting.enabled}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    aria-label={setting.label}
+                  />
+                </label>
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
+
+      {tab === "profile" && (
+        <div className="max-w-xl mx-auto space-y-4">
+          <ProfileHeader
+            name={displayName}
+            subtitle={`${hospitalLabel} · ${profile.hospitalType || "Level 1 Trauma Center"}`}
+            role="hospital"
+          />
+          <div className="space-y-3">
+            {[
+              { label: "Hospital / Facility", value: hospitalLabel },
+              { label: "Registration ID", value: profile.registrationNumber || "Not provided" },
+              { label: "Emergency Line", value: profile.emergencyNumber || profile.phone || user?.mobileNumber || "Not provided" },
+              { label: "ICU Capacity", value: profile.icuCapacity ? `${profile.icuCapacity} beds` : `${beds.icuTotal} beds (configured)` },
+              { label: "ER Capacity", value: profile.erCapacity ? `${profile.erCapacity} bays` : `${beds.erTotal} bays (configured)` },
+            ].map((row) => (
+              <div key={row.label} className="rounded-xl bg-white p-4 ring-1 ring-[#E5E7EB]">
+                <p className="text-[10px] font-bold uppercase text-[#525866]">{row.label}</p>
+                <p className="text-sm font-semibold text-[#111111]">{row.value}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
