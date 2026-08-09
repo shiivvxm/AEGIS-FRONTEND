@@ -69,7 +69,7 @@ function normalizeProfile(role: string, profile: Profile): Profile {
   } else if (role === "hospital") {
     profile.hospitalName = nameVal;
     profile.emergencyNumber = phoneVal;
-  } else if (role === "admin") {
+  } else if (role === "admin" || role === "traffic") {
     profile.officerName = nameVal;
     profile.mobileNumber = phoneVal;
   }

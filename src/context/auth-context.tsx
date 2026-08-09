@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
-export type Role = "citizen" | "volunteer" | "ambulance" | "hospital" | "admin";
+export type Role = "citizen" | "volunteer" | "ambulance" | "hospital" | "admin" | "traffic";
 
 export interface User {
   id: string;
@@ -103,6 +103,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: "Vivaan Sharma",
           role: "ambulance",
           mobileNumber: "9876543216",
+          isVerified: true,
+        },
+        traffic: {
+          id: "usr-traffic",
+          email: "traffic@aegis.gov.in",
+          name: "Inspector Rajesh Kumar",
+          role: "traffic",
+          mobileNumber: "9876543218",
           isVerified: true,
         },
       };

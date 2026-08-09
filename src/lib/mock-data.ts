@@ -183,3 +183,274 @@ export const platformStats = {
   citiesActive: 12,
   uptime: 99.98,
 };
+
+// ===== AEGIS COMMAND CENTER EXTENSIONS =====
+
+export interface AegisAgent {
+  id: string;
+  name: string;
+  status: "idle" | "processing" | "done" | "error";
+  currentTask: string;
+}
+
+export interface CCTVDetection {
+  type: "accident" | "vehicle" | "person" | "fire" | "smoke" | "crowd";
+  confidence: number;
+  timestamp: string;
+}
+
+export interface CCTVCamera {
+  id: string;
+  location: string;
+  zone: string;
+  status: "live" | "offline";
+  detections: CCTVDetection[];
+}
+
+export const cctvCameras: CCTVCamera[] = [
+  {
+    id: "CAM-001",
+    location: "NH-24 Bridge Overpass",
+    zone: "Sector 62",
+    status: "live",
+    detections: [
+      { type: "accident", confidence: 94, timestamp: "16:22:04" },
+      { type: "vehicle", confidence: 99, timestamp: "16:22:04" },
+      { type: "person", confidence: 87, timestamp: "16:22:05" },
+    ],
+  },
+  {
+    id: "CAM-002",
+    location: "Raj Nagar Flyover",
+    zone: "Raj Nagar",
+    status: "live",
+    detections: [
+      { type: "crowd", confidence: 78, timestamp: "16:21:30" },
+      { type: "vehicle", confidence: 95, timestamp: "16:21:31" },
+    ],
+  },
+  {
+    id: "CAM-003",
+    location: "Indirapuram Junction",
+    zone: "Indirapuram",
+    status: "offline",
+    detections: [],
+  },
+  {
+    id: "CAM-004",
+    location: "Vasundhara Sector 4",
+    zone: "Vasundhara",
+    status: "live",
+    detections: [
+      { type: "smoke", confidence: 72, timestamp: "16:20:15" },
+      { type: "fire", confidence: 68, timestamp: "16:20:16" },
+    ],
+  },
+  {
+    id: "CAM-005",
+    location: "GT Road Junction",
+    zone: "Govindpuram",
+    status: "live",
+    detections: [
+      { type: "vehicle", confidence: 91, timestamp: "16:19:44" },
+    ],
+  },
+];
+
+export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[] {
+  const stageOrder: Emergency["status"][] = [
+    "active",
+    "dispatched",
+    "en-route",
+    "at-hospital",
+    "resolved",
+  ];
+  const stageIdx = stageOrder.indexOf(incidentStatus);
+
+  const isDone = (requiredStage: number) => stageIdx >= requiredStage;
+  const isProcessing = (requiredStage: number) => stageIdx === requiredStage - 1;
+
+  return [
+    {
+      id: "incident-agent",
+      name: "Incident Agent",
+      status: isDone(1) ? "done" : isProcessing(1) ? "processing" : "idle",
+      currentTask: isDone(1)
+        ? "Severity classified · Victims estimated: 4–6"
+        : isProcessing(1)
+        ? "Classifying incident severity..."
+        : "Awaiting incident trigger",
+    },
+    {
+      id: "vision-agent",
+      name: "Vision Agent",
+      status: isDone(1) ? "done" : isProcessing(1) ? "processing" : "idle",
+      currentTask: isDone(1)
+        ? "CCTV analyzed · Accident + 4 persons detected (94%)"
+        : isProcessing(1)
+        ? "Processing CCTV feed CAM-001..."
+        : "Monitoring camera network",
+    },
+    {
+      id: "ambulance-agent",
+      name: "Ambulance Agent",
+      status: isDone(2) ? "done" : isProcessing(2) ? "processing" : "idle",
+      currentTask: isDone(2)
+        ? "AMB-100 selected · 96% match · ETA 4 min"
+        : isProcessing(2)
+        ? "Selecting optimal ambulance..."
+        : "Awaiting incident classification",
+    },
+    {
+      id: "hospital-agent",
+      name: "Hospital Agent",
+      status: isDone(2) ? "done" : isProcessing(2) ? "processing" : "idle",
+      currentTask: isDone(2)
+        ? "Apollo Hospital matched · ICU: 8 free · 3.2 km"
+        : isProcessing(2)
+        ? "Matching hospital capacity..."
+        : "Awaiting incident classification",
+    },
+    {
+      id: "traffic-agent",
+      name: "Traffic Agent",
+      status: isDone(3) ? "done" : isProcessing(3) ? "processing" : "idle",
+      currentTask: isDone(3)
+        ? "Green corridor active · 6 signals overridden"
+        : isProcessing(3)
+        ? "Creating emergency corridor..."
+        : "Awaiting dispatch confirmation",
+    },
+    {
+      id: "volunteer-agent",
+      name: "Volunteer Agent",
+      status: isDone(2) ? "done" : isProcessing(2) ? "processing" : "idle",
+      currentTask: isDone(2)
+        ? "2 volunteers notified · Nearest ETA 3 min"
+        : isProcessing(2)
+        ? "Locating certified nearby responders..."
+        : "Awaiting incident classification",
+    },
+    {
+      id: "command-agent",
+      name: "Command Agent",
+      status: isDone(3) ? "done" : isProcessing(3) ? "processing" : "idle",
+      currentTask: isDone(3)
+        ? "Response plan ready · Awaiting operator approval"
+        : isProcessing(3)
+        ? "Generating unified response plan..."
+        : "Coordinating all agents",
+    },
+  ];
+}
+
+// ===== TRAFFIC POLICE / TRAFFIC CONTROL EXTENSIONS =====
+
+export interface TrafficCorridor {
+  id: string;
+  ambulanceId: string;
+  incidentId: string;
+  routeName: string;
+  signalsOverridden: number;
+  status: "active" | "cleared" | "pending";
+  startTime: string;
+  etaSavedMin: number;
+  origin: string;
+  destination: string;
+}
+
+export interface TrafficSignal {
+  id: string;
+  intersection: string;
+  zone: string;
+  status: "green-override" | "normal-auto" | "manual-hold" | "congested";
+  overrideBy?: string;
+  timeRemainingSec: number;
+}
+
+export interface TrafficCongestionZone {
+  id: string;
+  zoneName: string;
+  congestionLevel: "critical" | "heavy" | "moderate" | "clear";
+  avgSpeedKmH: number;
+  activeIncidents: number;
+}
+
+export interface RoadBlockage {
+  id: string;
+  location: string;
+  zone: string;
+  cause: string;
+  severity: "high" | "medium" | "low";
+  reportedAt: string;
+  clearingETA: string;
+  reroutePlan: string;
+}
+
+export const initialTrafficCorridors: TrafficCorridor[] = [
+  {
+    id: "COR-101",
+    ambulanceId: "AMB-1083",
+    incidentId: "EMG-1258",
+    routeName: "Sector 62 Crossing → NH-24 → City Care Trauma Hub",
+    signalsOverridden: 6,
+    status: "active",
+    startTime: "16:22:10",
+    etaSavedMin: 6.5,
+    origin: "Sector 62 Crossing",
+    destination: "City Care Trauma Hub",
+  },
+  {
+    id: "COR-102",
+    ambulanceId: "AMB-1094",
+    incidentId: "EMG-1262",
+    routeName: "Raj Nagar Flyover → GT Road → Fortis Hospital",
+    signalsOverridden: 4,
+    status: "pending",
+    startTime: "16:20:00",
+    etaSavedMin: 4.2,
+    origin: "Raj Nagar Flyover",
+    destination: "Fortis Hospital",
+  },
+];
+
+export const initialTrafficSignals: TrafficSignal[] = [
+  { id: "SIG-621", intersection: "Sector 62 Main Junction", zone: "Sector 62", status: "green-override", overrideBy: "AMB-1083 Green Corridor", timeRemainingSec: 140 },
+  { id: "SIG-622", intersection: "NH-24 Bypass Slip Road", zone: "Sector 62", status: "green-override", overrideBy: "AMB-1083 Green Corridor", timeRemainingSec: 180 },
+  { id: "SIG-301", intersection: "Raj Nagar Flyover Entry", zone: "Raj Nagar", status: "normal-auto", timeRemainingSec: 45 },
+  { id: "SIG-404", intersection: "Indirapuram Metro Gate 2", zone: "Indirapuram", status: "congested", timeRemainingSec: 25 },
+  { id: "SIG-508", intersection: "GT Road Central Junction", zone: "Govindpuram", status: "normal-auto", timeRemainingSec: 60 },
+  { id: "SIG-712", intersection: "Vasundhara Sector 4 Crossing", zone: "Vasundhara", status: "green-override", overrideBy: "AMB-1094 Emergency", timeRemainingSec: 95 },
+];
+
+export const initialCongestionZones: TrafficCongestionZone[] = [
+  { id: "Z-01", zoneName: "NH-24 Bridge Flyover", congestionLevel: "critical", avgSpeedKmH: 14, activeIncidents: 2 },
+  { id: "Z-02", zoneName: "Raj Nagar Central Junction", congestionLevel: "heavy", avgSpeedKmH: 22, activeIncidents: 1 },
+  { id: "Z-03", zoneName: "Sector 62 Metro Corridor", congestionLevel: "clear", avgSpeedKmH: 52, activeIncidents: 1 },
+  { id: "Z-04", zoneName: "GT Road Industrial Crossing", congestionLevel: "moderate", avgSpeedKmH: 34, activeIncidents: 0 },
+  { id: "Z-05", zoneName: "Vasundhara Link Road", congestionLevel: "clear", avgSpeedKmH: 48, activeIncidents: 0 },
+];
+
+export const initialRoadBlockages: RoadBlockage[] = [
+  {
+    id: "BLK-01",
+    location: "NH-24 Underpass Flyover",
+    zone: "Sector 62",
+    cause: "Two-vehicle collision blocking Lane 1 & 2",
+    severity: "high",
+    reportedAt: "16:18",
+    clearingETA: "15 mins",
+    reroutePlan: "Divert light vehicles to Sector 62 Link Road; Keep emergency lane open",
+  },
+  {
+    id: "BLK-02",
+    location: "Raj Nagar Flyover Exit",
+    zone: "Raj Nagar",
+    cause: "Stalled freight truck on right shoulder",
+    severity: "medium",
+    reportedAt: "16:05",
+    clearingETA: "10 mins",
+    reroutePlan: "Use Service Road 3 for northbound traffic",
+  },
+];
+

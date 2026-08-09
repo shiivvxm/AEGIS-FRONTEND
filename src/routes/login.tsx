@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { 
-  HeartPulse, Shield, Ambulance, Building2, Users, 
+  HeartPulse, Shield, Ambulance, Building2, Users, TrafficCone,
   ChevronRight, Lock, Mail, Phone, Activity, Sparkles, AlertTriangle 
 } from "lucide-react";
 import { useAuth, type Role } from "@/hooks/use-auth";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Portal Access · AEGIS" },
-      { name: "description", content: "Access the AEGIS Emergency Response Platform. Select your portal: Citizen, First Responder, Ambulance Operator, Hospital Admin, or Command Officer." }
+      { name: "description", content: "Access the AEGIS Emergency Response Platform. Select your portal: Citizen, First Responder, Ambulance Operator, Hospital Admin, Command Officer, or Traffic Police." }
     ]
   }),
   component: LoginPortal,
@@ -71,6 +71,15 @@ const PORTAL_ROLES: { key: Role; title: string; tagline: string; icon: React.Ele
     color: "text-blue-600",
     border: "border-blue-600/10",
     bg: "bg-blue-600/5"
+  },
+  {
+    key: "traffic",
+    title: "Traffic Control",
+    tagline: "Live city traffic, emergency corridors, and CCTV feeds.",
+    icon: TrafficCone,
+    color: "text-emerald-600",
+    border: "border-emerald-600/10",
+    bg: "bg-emerald-600/5"
   },
   {
     key: "admin",
@@ -148,6 +157,7 @@ function LoginPortal() {
       if (loggedUser.role === "hospital") navigate({ to: "/hospital" });
       if (loggedUser.role === "ambulance") navigate({ to: "/ambulance" });
       if (loggedUser.role === "volunteer") navigate({ to: "/volunteer" });
+      if (loggedUser.role === "traffic") navigate({ to: "/traffic" });
       if (loggedUser.role === "admin") navigate({ to: "/command" });
     } catch (err: any) {
       toast.error(err.message || "Invalid credentials.");
@@ -168,6 +178,7 @@ function LoginPortal() {
       if (loggedUser.role === "hospital") navigate({ to: "/hospital" });
       if (loggedUser.role === "ambulance") navigate({ to: "/ambulance" });
       if (loggedUser.role === "volunteer") navigate({ to: "/volunteer" });
+      if (loggedUser.role === "traffic") navigate({ to: "/traffic" });
       if (loggedUser.role === "admin") navigate({ to: "/command" });
     } catch (err: any) {
       toast.error(err.message || "Invalid code or phone number.");

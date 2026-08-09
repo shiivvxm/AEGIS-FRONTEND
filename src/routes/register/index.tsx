@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { 
-  HeartPulse, Shield, Ambulance, Building2, Users, 
+  HeartPulse, Shield, Ambulance, Building2, Users, TrafficCone,
   ChevronRight, ArrowLeft 
 } from "lucide-react";
 
@@ -8,13 +8,13 @@ export const Route = createFileRoute("/register/")({
   head: () => ({
     meta: [
       { title: "Select Role · AEGIS Registration" },
-      { name: "description", content: "Select your role to register on the AEGIS Emergency Response Platform. Citizen, Hospital, Ambulance Driver, Volunteer, or Command Center Officer." }
+      { name: "description", content: "Select your role to register on the AEGIS Emergency Response Platform. Citizen, Hospital, Ambulance Driver, Volunteer, Command Center Officer, or Traffic Police." }
     ]
   }),
   component: RegisterRoleSelection,
 });
 
-type RoleKey = "citizen" | "volunteer" | "ambulance" | "hospital" | "command";
+type RoleKey = "citizen" | "volunteer" | "ambulance" | "hospital" | "traffic" | "command";
 
 interface RoleCard {
   key: RoleKey;
@@ -67,6 +67,16 @@ const REGISTER_ROLES: RoleCard[] = [
     bg: "bg-blue-600/5 hover:bg-blue-600/8",
     border: "border-blue-600/10 hover:border-blue-600/25",
     path: "/register/hospital",
+  },
+  {
+    key: "traffic",
+    title: "Traffic Control Officer",
+    description: "Monitor city traffic map, manage emergency green corridors, and inspect live CCTV feeds.",
+    icon: TrafficCone,
+    color: "text-emerald-600",
+    bg: "bg-emerald-600/5 hover:bg-emerald-600/8",
+    border: "border-emerald-600/10 hover:border-emerald-600/25",
+    path: "/login",
   },
   {
     key: "command",

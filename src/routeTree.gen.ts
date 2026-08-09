@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
+import { Route as TrafficRouteImport } from './routes/traffic'
 import { Route as TrackingRouteImport } from './routes/tracking'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HospitalRouteImport } from './routes/hospital'
@@ -29,6 +30,11 @@ import { Route as RegisterAmbulanceRouteImport } from './routes/register/ambulan
 const VolunteerRoute = VolunteerRouteImport.update({
   id: '/volunteer',
   path: '/volunteer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrafficRoute = TrafficRouteImport.update({
+  id: '/traffic',
+  path: '/traffic',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackingRoute = TrackingRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/hospital': typeof HospitalRoute
   '/login': typeof LoginRoute
   '/tracking': typeof TrackingRoute
+  '/traffic': typeof TrafficRoute
   '/volunteer': typeof VolunteerRoute
   '/register/ambulance': typeof RegisterAmbulanceRoute
   '/register/citizen': typeof RegisterCitizenRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/hospital': typeof HospitalRoute
   '/login': typeof LoginRoute
   '/tracking': typeof TrackingRoute
+  '/traffic': typeof TrafficRoute
   '/volunteer': typeof VolunteerRoute
   '/register/ambulance': typeof RegisterAmbulanceRoute
   '/register/citizen': typeof RegisterCitizenRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/hospital': typeof HospitalRoute
   '/login': typeof LoginRoute
   '/tracking': typeof TrackingRoute
+  '/traffic': typeof TrafficRoute
   '/volunteer': typeof VolunteerRoute
   '/register/ambulance': typeof RegisterAmbulanceRoute
   '/register/citizen': typeof RegisterCitizenRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/hospital'
     | '/login'
     | '/tracking'
+    | '/traffic'
     | '/volunteer'
     | '/register/ambulance'
     | '/register/citizen'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/hospital'
     | '/login'
     | '/tracking'
+    | '/traffic'
     | '/volunteer'
     | '/register/ambulance'
     | '/register/citizen'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/hospital'
     | '/login'
     | '/tracking'
+    | '/traffic'
     | '/volunteer'
     | '/register/ambulance'
     | '/register/citizen'
@@ -229,6 +241,7 @@ export interface RootRouteChildren {
   HospitalRoute: typeof HospitalRoute
   LoginRoute: typeof LoginRoute
   TrackingRoute: typeof TrackingRoute
+  TrafficRoute: typeof TrafficRoute
   VolunteerRoute: typeof VolunteerRoute
   RegisterAmbulanceRoute: typeof RegisterAmbulanceRoute
   RegisterCitizenRoute: typeof RegisterCitizenRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/volunteer'
       fullPath: '/volunteer'
       preLoaderRoute: typeof VolunteerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/traffic': {
+      id: '/traffic'
+      path: '/traffic'
+      fullPath: '/traffic'
+      preLoaderRoute: typeof TrafficRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tracking': {
@@ -365,6 +385,7 @@ const rootRouteChildren: RootRouteChildren = {
   HospitalRoute: HospitalRoute,
   LoginRoute: LoginRoute,
   TrackingRoute: TrackingRoute,
+  TrafficRoute: TrafficRoute,
   VolunteerRoute: VolunteerRoute,
   RegisterAmbulanceRoute: RegisterAmbulanceRoute,
   RegisterCitizenRoute: RegisterCitizenRoute,

@@ -1,19 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity,
+  AlertCircle,
+  AlertTriangle,
+  Ambulance,
   Bed,
   BedDouble,
+  Building2,
   CheckCircle2,
+  ChevronRight,
   Clock,
   HeartPulse,
+  Info,
   MapPin,
+  MessageSquare,
+  Phone,
+  Radio,
+  RefreshCw,
+  Shield,
+  Siren,
+  Sparkles,
   Users,
   Wrench,
+  XCircle,
 } from "lucide-react";
 import { SectionCard, SeverityBadge, StatCard } from "@/components/design-system";
 import { HospitalShell, type HospitalTab } from "@/components/roles/hospital-shell";
 import ProfileHeader from "@/components/profile/profile-header";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "@tanstack/react-router";
+import { getProfile } from "@/lib/profile";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Area,
   AreaChart,
@@ -25,19 +44,45 @@ import {
 } from "recharts";
 
 export const Route = createFileRoute("/hospital")({
-  head: () => ({ meta: [{ title: "Hospital Operations · AEGIS" }] }),
+  head: () => ({ meta: [{ title: "Hospital Operations Center · AEGIS" }] }),
   component: HospitalPortal,
 });
 
-interface IncomingPatient {
+export type CasePrepStage =
+  | "incoming"
+  | "acknowledged"
+  | "preparing-er"
+  | "team-ready"
+  | "arrived"
+  | "er-handover"
+  | "icu-trauma";
+
+const PREP_WORKFLOW_STEPS: { stage: CasePrepStage; label: string; actionLabel: string }[] = [
+  { stage: "incoming", label: "INCOMING", actionLabel: "Acknowledge Case" },
+  { stage: "acknowledged", label: "ACKNOWLEDGED", actionLabel: "Prepare ER Bay 3" },
+  { stage: "preparing-er", label: "PREPARING ER BAY", actionLabel: "Confirm Team Ready" },
+  { stage: "team-ready", label: "TEAM READY", actionLabel: "Mark Patient Arrived" },
+  { stage: "arrived", label: "PATIENT ARRIVED", actionLabel: "Complete ER Handover" },
+  { stage: "er-handover", label: "ER HANDOVER", actionLabel: "Transfer to ICU / Trauma" },
+  { stage: "icu-trauma", label: "TRANSFERRED TO ICU", actionLabel: "Case Admitted & Active" },
+];
+
+interface IncomingCase {
   id: string;
   type: string;
   severity: "critical" | "high" | "medium" | "low";
   ambulanceId: string;
+  ambulanceDriver: string;
   victims: number;
   location: string;
-  eta: number;
+  eta: number; // minutes
   vitals: { hr: number; spo2: number; bp: string; gcs: number };
+  requiredTreatment: string;
+  icuRequired: boolean;
+  traumaLevelRequired: string;
+  ventilatorRequired: boolean;
+  stage: CasePrepStage;
+  isLiveFeed: boolean;
 }
 
 const occupancyData = [
@@ -48,12 +93,6 @@ const occupancyData = [
   { hour: "18", er: 86, icu: 88 },
   { hour: "21", er: 62, icu: 75 },
 ];
-
-import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { getProfile } from "@/lib/profile";
-import { toast } from "sonner";
 
 function HospitalPortal() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -66,7 +105,62 @@ function HospitalPortal() {
   }, [isAuthenticated, user, isLoading, navigate]);
 
   const [tab, setTab] = useState<HospitalTab>("overview");
-  const [beds, setBeds] = useState({ icu: 8, er: 12, ward: 32, ot: 3 });
+  const [traumaAvailability, setTraumaAvailability] = useState<"accepting" | "caution" | "diversion">("accepting");
+
+  // Detailed bed breakdown
+  const [beds, setBeds] = useState({
+    icuTotal: 20,
+    icuOccupied: 12,
+    icuReserved: 3,
+    icuFree: 5,
+    erTotal: 24,
+    erOccupied: 14,
+    erReserved: 2,
+    erFree: 8,
+    erCleaning: 2,
+    otTotal: 6,
+    otOccupied: 4,
+    otFree: 2,
+  });
+
+  const [incomingCases, setIncomingCases] = useState<IncomingCase[]>([
+    {
+      id: "EMG-1258",
+      type: "Cardiac Distress / Acute STEMI",
+      severity: "critical",
+      ambulanceId: "AMB-1083",
+      ambulanceDriver: "Vivaan Sharma",
+      victims: 1,
+      location: "Sector 62 Crossing, Noida",
+      eta: 4,
+      vitals: { hr: 94, spo2: 91, bp: "145/95", gcs: 14 },
+      requiredTreatment: "Cath Lab, Emergency Defibrillator, O2 High Flow",
+      icuRequired: true,
+      traumaLevelRequired: "Level 1 Cardiac Trauma Bay",
+      ventilatorRequired: true,
+      stage: "preparing-er",
+      isLiveFeed: true,
+    },
+    {
+      id: "EMG-1262",
+      type: "Road Traffic Accident (Polytrauma)",
+      severity: "high",
+      ambulanceId: "AMB-1094",
+      ambulanceDriver: "Arjun Singh",
+      victims: 2,
+      location: "NH-24 Hindon Bridge",
+      eta: 8,
+      vitals: { hr: 112, spo2: 95, bp: "110/70", gcs: 12 },
+      requiredTreatment: "X-Ray, Trauma Surgical Team, Blood Unit O−",
+      icuRequired: true,
+      traumaLevelRequired: "Level 1 Trauma Surgical Bay",
+      ventilatorRequired: false,
+      stage: "incoming",
+      isLiveFeed: false,
+    },
+  ]);
+
+  const [commTarget, setCommTarget] = useState<string | null>(null);
 
   if (isLoading || !isAuthenticated || user?.role !== "hospital") {
     return (
@@ -75,38 +169,46 @@ function HospitalPortal() {
       </div>
     );
   }
-  const [incoming, setIncoming] = useState<IncomingPatient[]>([
-    {
-      id: "EMG-1258",
-      type: "Cardiac Distress",
-      severity: "critical",
-      ambulanceId: "AMB-1083",
-      victims: 1,
-      location: "Sector 62 Crossing",
-      eta: 4,
-      vitals: { hr: 94, spo2: 91, bp: "145/95", gcs: 14 },
-    },
-    {
-      id: "EMG-1262",
-      type: "Road Traffic Accident",
-      severity: "high",
-      ambulanceId: "AMB-1094",
-      victims: 2,
-      location: "NH-24 Hindon Bridge",
-      eta: 8,
-      vitals: { hr: 112, spo2: 95, bp: "110/70", gcs: 12 },
-    },
-  ]);
 
-  const readinessScore = Math.round(((beds.icu / 20 + beds.er / 24 + beds.ot / 6) / 3) * 100);
+  // Readiness Score Breakdown Math
+  const icuFactor = Math.round((beds.icuFree / beds.icuTotal) * 100);
+  const erFactor = Math.round((beds.erFree / beds.erTotal) * 100);
+  const equipmentFactor = 88; // 88% equipment ready
+  const staffFactor = 90; // 90% staff on duty
+  const readinessScore = Math.round(icuFactor * 0.35 + erFactor * 0.3 + staffFactor * 0.2 + equipmentFactor * 0.15);
 
-  const handleAccept = (id: string) => {
-    const p = incoming.find((x) => x.id === id);
-    if (!p) return;
-    setIncoming((prev) => prev.filter((x) => x.id !== id));
-    if (p.severity === "critical") setBeds((b) => ({ ...b, icu: Math.max(0, b.icu - 1) }));
-    else setBeds((b) => ({ ...b, er: Math.max(0, b.er - 1) }));
-    toast.success(`${id} accepted — ${p.severity === "critical" ? "ICU bay" : "ER bay"} reserved. Trauma team alerted.`);
+  const handleAdvanceCaseWorkflow = (caseId: string) => {
+    setIncomingCases((prev) =>
+      prev.map((c) => {
+        if (c.id === caseId) {
+          const currentIdx = PREP_WORKFLOW_STEPS.findIndex((s) => s.stage === c.stage);
+          if (currentIdx < PREP_WORKFLOW_STEPS.length - 1) {
+            const nextStage = PREP_WORKFLOW_STEPS[currentIdx + 1].stage;
+            toast.success(`${c.id}: Case workflow advanced to ${PREP_WORKFLOW_STEPS[currentIdx + 1].label}`);
+            return { ...c, stage: nextStage };
+          }
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleDivertCase = (caseId: string) => {
+    setIncomingCases((prev) => prev.filter((c) => c.id !== caseId));
+    toast.error(`Case ${caseId} diverted to next available hospital in grid.`);
+  };
+
+  const handleToggleTraumaStatus = () => {
+    if (traumaAvailability === "accepting") {
+      setTraumaAvailability("caution");
+      toast.warning("Hospital status changed to CAUTION: High ER Occupancy.");
+    } else if (traumaAvailability === "caution") {
+      setTraumaAvailability("diversion");
+      toast.error("Hospital status changed to TRAUMA DIVERSION: Emergency cases diverted.");
+    } else {
+      setTraumaAvailability("accepting");
+      toast.success("Hospital status changed to ACCEPTING TRAUMA: Full operations.");
+    }
   };
 
   return (
@@ -114,159 +216,429 @@ function HospitalPortal() {
       activeTab={tab}
       onTabChange={setTab}
       statusBadge={
-        <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success">
-          Accepting trauma
-        </span>
+        <button
+          type="button"
+          onClick={handleToggleTraumaStatus}
+          className={`rounded-full px-3 py-1 text-xs font-bold transition-all border cursor-pointer ${
+            traumaAvailability === "accepting"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : traumaAvailability === "caution"
+              ? "bg-amber-50 text-amber-700 border-amber-200"
+              : "bg-red-50 text-red-700 border-red-200"
+          }`}
+        >
+          {traumaAvailability === "accepting" && "● Accepting Trauma (Level 1)"}
+          {traumaAvailability === "caution" && "⚠️ High Occupancy (Caution)"}
+          {traumaAvailability === "diversion" && "⛔ Trauma Diversion Active"}
+        </button>
       }
     >
+      {/* ═══════════════════════════════════════════════════════════════
+          OPERATIONS CENTER HEADER BANNER
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 border border-blue-800 rounded-2xl p-5 mb-6 text-white shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-blue-800/80 pb-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-blue-400" />
+            </div>
+            <div>
+              <h1 className="text-base font-black tracking-wide uppercase">
+                AEGIS Emergency Hospital Operations Center
+              </h1>
+              <p className="text-xs text-blue-200 mt-0.5">
+                City Care Hospital · Level 1 Trauma Center · Grid Node #HSP-10
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="rounded-full bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 font-bold text-emerald-300">
+              ● Grid Connection Online
+            </span>
+            <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-3 py-1 font-mono font-bold text-blue-300">
+              Readiness: {readinessScore}%
+            </span>
+          </div>
+        </div>
+
+        {/* Operational Metrics Header Row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs text-center">
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">Incoming Ambulances</p>
+            <p className="text-xl font-black text-white mt-0.5">{incomingCases.length}</p>
+            <p className="text-[9px] text-emerald-400 font-bold">Earliest ETA: 4 min</p>
+          </div>
+
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">ICU Capacity</p>
+            <p className="text-xl font-black text-amber-400 mt-0.5">{beds.icuFree} / {beds.icuTotal}</p>
+            <p className="text-[9px] text-gray-300 font-semibold">{beds.icuReserved} Reserved</p>
+          </div>
+
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">ER Bays Capacity</p>
+            <p className="text-xl font-black text-blue-400 mt-0.5">{beds.erFree} / {beds.erTotal}</p>
+            <p className="text-[9px] text-gray-300 font-semibold">{beds.erReserved} Reserved</p>
+          </div>
+
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">Operating Theatres</p>
+            <p className="text-xl font-black text-emerald-400 mt-0.5">{beds.otFree} / {beds.otTotal}</p>
+            <p className="text-[9px] text-emerald-400 font-bold">2 Ready for Surgery</p>
+          </div>
+
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">On-Duty Trauma Crew</p>
+            <p className="text-xl font-black text-white mt-0.5">18</p>
+            <p className="text-[9px] text-blue-300 font-semibold">4 Surgeons Ready</p>
+          </div>
+
+          <div className="bg-blue-950/60 p-3 rounded-xl border border-blue-800/60">
+            <p className="text-[9px] font-bold text-blue-300 uppercase">Hospital Agent Status</p>
+            <p className="text-xs font-extrabold text-emerald-400 mt-1">ACTIVE</p>
+            <p className="text-[9px] text-gray-300">Bay 3 Pre-Allocated</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 1: OVERVIEW & INCOMING CASES WORKFLOW
+      ═══════════════════════════════════════════════════════════════ */}
       {tab === "overview" && (
         <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Incoming" value={incoming.length} hint="Ambulances en-route" icon={HeartPulse} accent="emergency" />
-            <StatCard label="ICU Available" value={`${beds.icu}/20`} icon={BedDouble} accent="warning" />
-            <StatCard label="ER Bays" value={`${beds.er}/24`} icon={Bed} accent="medical" />
-            <StatCard label="Readiness Score" value={`${readinessScore}%`} hint="Emergency capacity" icon={Activity} accent="success" />
-          </div>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard title="Critical Alerts" description="Requires immediate action">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 rounded-lg border border-[#E63946]/20 bg-[#E63946]/5 p-3">
-                  <HeartPulse className="h-5 w-5 text-[#E63946]" />
-                  <div>
-                    <p className="text-sm font-bold text-[#111111]">EMG-1258 arriving in 4 min</p>
-                    <p className="text-xs text-[#525866]">Cardiac distress · ICU prep required</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-lg border border-warning/20 bg-warning/5 p-3">
-                  <Wrench className="h-5 w-5 text-warning" />
-                  <div>
-                    <p className="text-sm font-bold text-[#111111]">Ventilator utilization at 75%</p>
-                    <p className="text-xs text-[#525866]">12 of 16 units active</p>
-                  </div>
-                </div>
+          {/* Incoming Cases & Workflow Controls */}
+          <SectionCard
+            title="Incoming Ambulance Cases & Hospital Prep Workflow"
+            description="Real-time telemetry and preparation steps for en-route ambulances"
+            actions={
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCommTarget("Command Center Dispatch")}
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-slate-50"
+                >
+                  Contact Command Center
+                </button>
               </div>
-            </SectionCard>
-            <SectionCard title="Ambulance Arrival Tracking">
-              {incoming.slice(0, 2).map((p) => (
-                <div key={p.id} className="flex items-center justify-between border-b border-[#E5E7EB] py-3 last:border-0">
-                  <div>
-                    <p className="text-sm font-bold text-[#111111]">{p.ambulanceId}</p>
-                    <p className="text-xs text-[#525866]">{p.type}</p>
-                  </div>
-                  <span className="flex items-center gap-1 text-sm font-bold text-warning">
-                    <Clock className="h-4 w-4" /> {p.eta}m
-                  </span>
-                </div>
-              ))}
-            </SectionCard>
-          </div>
-        </div>
-      )}
+            }
+          >
+            {incomingCases.length === 0 ? (
+              <div className="py-10 text-center space-y-2">
+                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
+                <p className="text-sm font-bold text-gray-900">No incoming critical ambulance cases</p>
+                <p className="text-xs text-gray-500">Hospital trauma bays are ready on standby.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {incomingCases.map((c) => {
+                  const currentPrep = PREP_WORKFLOW_STEPS.find((s) => s.stage === c.stage) ?? PREP_WORKFLOW_STEPS[0];
+                  const currentIdx = PREP_WORKFLOW_STEPS.findIndex((s) => s.stage === c.stage);
 
-      {tab === "patients" && (
-        <SectionCard title="Emergency Queue" description="Incoming patient feed with live vitals">
-          {incoming.length === 0 ? (
-            <div className="py-12 text-center">
-              <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
-              <p className="mt-2 text-sm font-semibold text-[#111111]">No incoming cases</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#E5E7EB] text-[10px] font-bold uppercase text-[#525866]">
-                    <th className="pb-3 pr-4">Case</th>
-                    <th className="pb-3 pr-4">Severity</th>
-                    <th className="pb-3 pr-4">Ambulance</th>
-                    <th className="pb-3 pr-4">ETA</th>
-                    <th className="pb-3 pr-4">Vitals</th>
-                    <th className="pb-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {incoming.map((e) => (
-                    <tr key={e.id} className="border-b border-[#E5E7EB]">
-                      <td className="py-4 pr-4">
-                        <p className="font-bold text-[#111111]">{e.id}</p>
-                        <p className="text-xs text-[#525866]">{e.type}</p>
-                        <p className="flex items-center gap-1 text-[10px] text-[#525866]">
-                          <MapPin className="h-3 w-3" /> {e.location}
-                        </p>
-                      </td>
-                      <td className="py-4 pr-4">
-                        <SeverityBadge severity={e.severity} />
-                      </td>
-                      <td className="py-4 pr-4 font-mono text-xs">{e.ambulanceId}</td>
-                      <td className="py-4 pr-4 font-bold text-warning">{e.eta}m</td>
-                      <td className="py-4 pr-4 font-mono text-[10px]">
-                        HR {e.vitals.hr} · SpO₂ {e.vitals.spo2}% · GCS {e.vitals.gcs}
-                      </td>
-                      <td className="py-4">
-                        <div className="flex gap-1">
-                          <button type="button" onClick={() => handleAccept(e.id)} className="rounded-lg bg-success px-3 py-1.5 text-xs font-bold text-white">
-                            Accept
+                  return (
+                    <div
+                      key={c.id}
+                      className="rounded-2xl border-2 border-blue-200 bg-white p-5 shadow-sm space-y-4"
+                    >
+                      {/* Case Header */}
+                      <div className="flex flex-wrap items-start justify-between gap-2 border-b border-gray-100 pb-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono font-black text-gray-900">{c.id}</span>
+                            <SeverityBadge severity={c.severity} />
+                            {c.isLiveFeed ? (
+                              <span className="rounded bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider">
+                                LIVE TELEMETRY FEED
+                              </span>
+                            ) : (
+                              <span className="rounded bg-gray-100 text-gray-600 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider">
+                                DEMO SIMULATION
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-sm font-extrabold text-gray-900">{c.type}</h3>
+                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5 text-[#E63946]" /> {c.location}
+                          </p>
+                        </div>
+
+                        <div className="text-right space-y-1">
+                          <span className="rounded-full bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 text-xs font-extrabold flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" /> ETA {c.eta} min
+                          </span>
+                          <p className="text-[10px] text-gray-500 font-mono font-bold mt-1">
+                            Ambulance: {c.ambulanceId} ({c.ambulanceDriver})
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Vitals & Requirements Row */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase">Live Vitals Telemetry</p>
+                          <p className="font-mono font-bold text-gray-900 mt-0.5">
+                            HR {c.vitals.hr} · SpO₂ {c.vitals.spo2}%
+                          </p>
+                          <p className="font-mono text-[10px] text-gray-600">BP {c.vitals.bp} · GCS {c.vitals.gcs}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase">Required Resources</p>
+                          <p className="font-semibold text-gray-900 mt-0.5">{c.requiredTreatment}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase">ICU &amp; Trauma Requirement</p>
+                          <p className="font-bold text-amber-700 mt-0.5">{c.traumaLevelRequired}</p>
+                          <p className="text-[10px] text-gray-600">{c.icuRequired ? "ICU Bed Reserved" : "General ER Bay"}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase">Ventilator Needed</p>
+                          <p className={`font-bold mt-0.5 ${c.ventilatorRequired ? "text-red-600" : "text-gray-600"}`}>
+                            {c.ventilatorRequired ? "YES (Unit Ready)" : "No"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Interactive Prep Stepper */}
+                      <div className="space-y-2 pt-1">
+                        <div className="flex items-center justify-between">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Hospital Preparation Workflow</p>
+                          <span className="text-[10px] font-bold text-blue-600">Stage: {currentPrep.label}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                          {PREP_WORKFLOW_STEPS.map((s, idx) => (
+                            <div
+                              key={s.stage}
+                              className={`shrink-0 rounded-lg px-2.5 py-1 text-[9px] font-extrabold border transition-all ${
+                                currentIdx === idx
+                                  ? "bg-blue-600 text-white border-blue-600"
+                                  : idx < currentIdx
+                                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                  : "bg-gray-50 border-gray-200 text-gray-400"
+                              }`}
+                            >
+                              {s.label}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => handleAdvanceWorkflow(c.id)}
+                            className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-xs font-bold text-white transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <span>Action: {currentPrep.actionLabel}</span>
+                            <ChevronRight className="h-4 w-4" />
                           </button>
-                          <button type="button" onClick={() => { setIncoming((p) => p.filter((x) => x.id !== e.id)); toast.info(`${e.id} diverted. Case re-routed to next available hospital.`); }} className="rounded-lg border border-[#E63946]/30 px-3 py-1.5 text-xs font-bold text-[#E63946] hover:bg-red-50 transition-colors">
-                            Divert
+
+                          <button
+                            type="button"
+                            onClick={() => setCommTarget(`Ambulance ${c.ambulanceId}`)}
+                            className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-bold text-gray-700 hover:bg-slate-50 flex items-center gap-1"
+                          >
+                            <Phone className="h-3.5 w-3.5 text-blue-600" /> Contact Driver
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDivertCase(c.id)}
+                            className="rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-bold text-red-600 hover:bg-red-100"
+                          >
+                            Divert Case
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </SectionCard>
-      )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
 
-      {tab === "beds" && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {(
-            [
-              ["icu", "ICU Trauma Beds", 20, "warning"],
-              ["er", "ER Emergency Bays", 24, "medical"],
-              ["ward", "General Ward", 180, "success"],
-              ["ot", "Operation Theatres", 6, "emergency"],
-            ] as const
-          ).map(([key, label, max, accent]) => (
-            <SectionCard key={key} title={label} description={`${beds[key]} of ${max} available`}>
-              <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setBeds((b) => ({ ...b, [key]: Math.max(0, b[key] - 1) }))} className="h-9 w-9 rounded-lg ring-1 ring-[#E5E7EB]">−</button>
-                <div className="h-3 flex-1 overflow-hidden rounded-full bg-[#F8F9FB]">
-                  <div className="h-full bg-medical" style={{ width: `${(beds[key] / max) * 100}%` }} />
+          {/* Hospital Readiness Breakdown & Agent Advice */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Readiness Score Calculation Explanation */}
+            <SectionCard title="Hospital Readiness Score Breakdown" description={`Overall Score: ${readinessScore}%`}>
+              <div className="space-y-3">
+                <div className="rounded-xl bg-slate-50 p-4 border border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span>ICU Availability Weight (35%)</span>
+                    <span className="text-amber-600">{icuFactor}% ({beds.icuFree} free)</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="h-full bg-amber-500" style={{ width: `${icuFactor}%` }} />
+                  </div>
                 </div>
-                <button type="button" onClick={() => setBeds((b) => ({ ...b, [key]: b[key] + 1 }))} className="h-9 w-9 rounded-lg ring-1 ring-[#E5E7EB]">+</button>
+
+                <div className="rounded-xl bg-slate-50 p-4 border border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span>ER Bays Availability Weight (30%)</span>
+                    <span className="text-blue-600">{erFactor}% ({beds.erFree} free)</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="h-full bg-blue-500" style={{ width: `${erFactor}%` }} />
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-slate-50 p-4 border border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span>Trauma Staff Readiness Weight (20%)</span>
+                    <span className="text-emerald-600">{staffFactor}% (18 on duty)</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="h-full bg-emerald-500" style={{ width: `${staffFactor}%` }} />
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-slate-50 p-4 border border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span>Equipment &amp; Ventilators Weight (15%)</span>
+                    <span className="text-purple-600">{equipmentFactor}% Ready</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="h-full bg-purple-500" style={{ width: `${equipmentFactor}%` }} />
+                  </div>
+                </div>
               </div>
             </SectionCard>
-          ))}
+
+            {/* Hospital Agent Recommendations */}
+            <SectionCard title="Hospital Agent AI Advice" description="Intelligent capacity management recommendations">
+              <div className="space-y-3 text-xs">
+                <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-blue-600 animate-pulse" />
+                    <span className="font-extrabold text-blue-900 uppercase">ER Bay 3 Pre-Allocation</span>
+                  </div>
+                  <p className="text-blue-950 leading-relaxed font-medium">
+                    Hospital Agent automatically pre-allocated ER Bay 3 for incoming STEMI case EMG-1258 based on proximity to Cath Lab.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <span className="font-extrabold text-amber-900 uppercase">ICU Bed Reservation Advisory</span>
+                  </div>
+                  <p className="text-amber-950 leading-relaxed font-medium">
+                    Reserve ICU Bed 4 for polytrauma case EMG-1262 arriving in 8 min. 3 ICU beds remaining in Trauma Ward B.
+                  </p>
+                </div>
+              </div>
+            </SectionCard>
+          </div>
         </div>
       )}
 
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 2: BEDS & ER BAYS CAPACITY
+      ═══════════════════════════════════════════════════════════════ */}
+      {tab === "beds" && (
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="ICU Total" value={beds.icuTotal} hint={`${beds.icuFree} Free · ${beds.icuReserved} Reserved`} icon={BedDouble} accent="warning" />
+            <StatCard label="ER Bays Total" value={beds.erTotal} hint={`${beds.erFree} Free · ${beds.erCleaning} Sanitizing`} icon={Bed} accent="medical" />
+            <StatCard label="Operating Theatres" value={beds.otTotal} hint={`${beds.otFree} Free for Emergency Surgery`} icon={Activity} accent="success" />
+            <StatCard label="General Ward Beds" value="180" hint="32 Free" icon={Building2} accent="default" />
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <SectionCard title="ER Bays Status Matrix" description="Real-time bay utilization">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 text-center text-xs">
+                {Array.from({ length: beds.erTotal }, (_, i) => {
+                  const bayNum = i + 1;
+                  const isOccupied = i < beds.erOccupied;
+                  const isReserved = !isOccupied && i < beds.erOccupied + beds.erReserved;
+                  const isCleaning = !isOccupied && !isReserved && i < beds.erOccupied + beds.erReserved + beds.erCleaning;
+                  const isFree = !isOccupied && !isReserved && !isCleaning;
+
+                  return (
+                    <div
+                      key={bayNum}
+                      className={`rounded-xl p-3 border font-bold transition-all ${
+                        isOccupied
+                          ? "bg-red-50 border-red-200 text-red-700"
+                          : isReserved
+                          ? "bg-amber-50 border-amber-200 text-amber-700"
+                          : isCleaning
+                          ? "bg-purple-50 border-purple-200 text-purple-700"
+                          : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      }`}
+                    >
+                      <p className="text-[10px] uppercase">Bay {bayNum}</p>
+                      <p className="text-xs mt-1">
+                        {isOccupied ? "Occupied" : isReserved ? "Reserved" : isCleaning ? "Cleaning" : "Free"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionCard>
+
+            <SectionCard title="ICU Beds Status Matrix" description="Trauma & Cardiac ICU Ward">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 text-center text-xs">
+                {Array.from({ length: beds.icuTotal }, (_, i) => {
+                  const bedNum = i + 1;
+                  const isOccupied = i < beds.icuOccupied;
+                  const isReserved = !isOccupied && i < beds.icuOccupied + beds.icuReserved;
+                  const isFree = !isOccupied && !isReserved;
+
+                  return (
+                    <div
+                      key={bedNum}
+                      className={`rounded-xl p-3 border font-bold transition-all ${
+                        isOccupied
+                          ? "bg-red-50 border-red-200 text-red-700"
+                          : isReserved
+                          ? "bg-amber-50 border-amber-200 text-amber-700"
+                          : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      }`}
+                    >
+                      <p className="text-[10px] uppercase">ICU {bedNum}</p>
+                      <p className="text-xs mt-1">
+                        {isOccupied ? "Occupied" : isReserved ? "Reserved" : "Free"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionCard>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 3: STAFF & ON-CALL TEAMS
+      ═══════════════════════════════════════════════════════════════ */}
       {tab === "staff" && (
-        <SectionCard title="Staff Scheduling" description="On-call emergency personnel">
-          <table className="w-full text-sm">
+        <SectionCard title="Emergency Trauma Staff & On-Call Roster" description="Personnel ready for incoming cases">
+          <table className="w-full text-sm text-left">
             <thead>
               <tr className="border-b border-[#E5E7EB] text-[10px] font-bold uppercase text-[#525866]">
-                <th className="pb-3 text-left">Name</th>
-                <th className="pb-3 text-left">Role</th>
-                <th className="pb-3 text-left">Shift</th>
-                <th className="pb-3 text-left">Status</th>
+                <th className="pb-3">Name</th>
+                <th className="pb-3">Specialty / Role</th>
+                <th className="pb-3">Shift</th>
+                <th className="pb-3">Assigned Case</th>
+                <th className="pb-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { name: "Dr. Karan Verma", role: "Trauma Surgeon", shift: "06:00–14:00", status: "In surgery", ok: false },
-                { name: "Dr. Meera Iyer", role: "ER Cardiologist", shift: "08:00–20:00", status: "Available", ok: true },
-                { name: "S. Nurse Ananya Nair", role: "Trauma Coordinator", shift: "07:00–19:00", status: "Available", ok: true },
-                { name: "Dr. Rakesh Verma", role: "Triage Director", shift: "08:00–20:00", status: "Available", ok: true },
+                { name: "Dr. Karan Verma", role: "Lead Trauma Surgeon", shift: "06:00–14:00", assigned: "EMG-1262 (Polytrauma)", status: "In Surgery", ok: false },
+                { name: "Dr. Meera Iyer", role: "ER Cardiologist", shift: "08:00–20:00", assigned: "EMG-1258 (STEMI)", status: "Team Ready", ok: true },
+                { name: "S. Nurse Ananya Nair", role: "Trauma Coordinator", shift: "07:00–19:00", assigned: "ER Bay 3 Prep", status: "Available", ok: true },
+                { name: "Dr. Rakesh Verma", role: "Triage Director", shift: "08:00–20:00", assigned: "Emergency Triage", status: "Available", ok: true },
               ].map((s) => (
                 <tr key={s.name} className="border-b border-[#E5E7EB]">
-                  <td className="py-3 font-semibold text-[#111111]">{s.name}</td>
-                  <td className="py-3 text-[#525866]">{s.role}</td>
-                  <td className="py-3 font-mono text-xs text-[#525866]">{s.shift}</td>
-                  <td className="py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${s.ok ? "bg-success/10 text-success" : "bg-[#E63946]/10 text-[#E63946]"}`}>
+                  <td className="py-3.5 font-bold text-[#111111]">{s.name}</td>
+                  <td className="py-3.5 text-xs text-[#525866]">{s.role}</td>
+                  <td className="py-3.5 font-mono text-xs text-[#525866]">{s.shift}</td>
+                  <td className="py-3.5 text-xs font-semibold text-gray-900">{s.assigned}</td>
+                  <td className="py-3.5">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${s.ok ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
                       {s.status}
                     </span>
                   </td>
@@ -277,114 +649,79 @@ function HospitalPortal() {
         </SectionCard>
       )}
 
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 4: EQUIPMENT & RESOURCES
+      ═══════════════════════════════════════════════════════════════ */}
       {tab === "resources" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <SectionCard title="Equipment Tracking">
+          <SectionCard title="Lifesaving Equipment Readiness">
             {[
-              { name: "Ventilators", used: 12, total: 16 },
-              { name: "Defibrillators", used: 4, total: 8 },
-              { name: "Portable X-Ray", used: 2, total: 3 },
+              { name: "Ventilator Units", used: 12, total: 16 },
+              { name: "Emergency Defibrillators", used: 4, total: 8 },
+              { name: "Portable X-Ray & Scanners", used: 2, total: 3 },
+              { name: "Cath Lab Angiography", used: 1, total: 2 },
             ].map((eq) => (
-              <div key={eq.name} className="mb-4 last:mb-0">
+              <div key={eq.name} className="mb-4 last:mb-0 space-y-1">
                 <div className="flex justify-between text-xs font-bold text-[#111111]">
                   <span>{eq.name}</span>
-                  <span>{eq.used}/{eq.total}</span>
+                  <span>{eq.used} / {eq.total} Active</span>
                 </div>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#F8F9FB]">
-                  <div className="h-full bg-medical" style={{ width: `${(eq.used / eq.total) * 100}%` }} />
+                <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-full bg-blue-600" style={{ width: `${(eq.used / eq.total) * 100}%` }} />
                 </div>
               </div>
             ))}
           </SectionCard>
-          <SectionCard title="Blood Bank & Oxygen">
+
+          <SectionCard title="Blood Bank &amp; Oxygen Reserves">
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-[#F8F9FB] p-4 text-center">
-                <p className="text-[10px] font-bold uppercase text-[#525866]">O− Units</p>
-                <p className="text-2xl font-bold text-[#E63946]">14</p>
+              <div className="rounded-xl bg-red-50 border border-red-100 p-4 text-center">
+                <p className="text-[10px] font-bold uppercase text-gray-500">O− Blood Units</p>
+                <p className="text-3xl font-black text-red-600 mt-1">14</p>
+                <p className="text-[10px] text-red-700 font-bold mt-1">Universal Supply Ready</p>
               </div>
-              <div className="rounded-xl bg-[#F8F9FB] p-4 text-center">
-                <p className="text-[10px] font-bold uppercase text-[#525866]">O₂ Capacity</p>
-                <p className="text-2xl font-bold text-success">88%</p>
+
+              <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4 text-center">
+                <p className="text-[10px] font-bold uppercase text-gray-500">Oxygen Central Supply</p>
+                <p className="text-3xl font-black text-emerald-600 mt-1">88%</p>
+                <p className="text-[10px] text-emerald-700 font-bold mt-1">Tank Pressure Normal</p>
               </div>
             </div>
           </SectionCard>
         </div>
       )}
 
-      {tab === "analytics" && (
-        <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <StatCard label="Avg Handover" value="5.8 min" icon={Clock} accent="medical" />
-            <StatCard label="Bed Occupancy" value="86%" icon={BedDouble} accent="warning" />
-            <StatCard label="Weekly Admissions" value="142" icon={Users} accent="success" />
-          </div>
-          <SectionCard title="Ward Occupancy Forecast" description="24-hour projection">
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={occupancyData}>
-                <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
-                <XAxis dataKey="hour" stroke="#525866" fontSize={11} />
-                <YAxis stroke="#525866" fontSize={11} />
-                <Tooltip contentStyle={{ background: "#FFF", border: "1px solid #E5E7EB", borderRadius: 8 }} />
-                <Area type="monotone" dataKey="er" name="ER %" stroke="#0284C7" fill="#0284C7" fillOpacity={0.1} />
-                <Area type="monotone" dataKey="icu" name="ICU %" stroke="#E63946" fill="#E63946" fillOpacity={0.1} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </SectionCard>
-        </div>
+      {/* Communication Channel Modal */}
+      {commTarget && (
+        <Dialog open={true} onOpenChange={() => setCommTarget(null)}>
+          <DialogContent className="sm:max-w-md bg-white p-6">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-blue-600">
+                <Phone className="h-5 w-5 animate-pulse" />
+                <span>Connecting to {commTarget}</span>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <p className="text-xs text-gray-600">
+                Opening direct voice &amp; data channel with {commTarget}...
+              </p>
+              <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs font-mono text-emerald-600 text-center font-bold">
+                ● AUDIO CHANNEL SECURED
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  toast.success(`Message transmitted to ${commTarget}`);
+                  setCommTarget(null);
+                }}
+                className="w-full rounded-xl bg-blue-600 py-2.5 text-xs font-bold text-white hover:bg-blue-700"
+              >
+                Transmit Audio Briefing
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
-
-      {tab === "profile" && (() => {
-        const profile = getProfile("hospital");
-        const name = profile.hospitalName || user?.name || "Hospital Admin";
-        const subtitle = `${profile.hospitalType || "Trauma Hub"} · ID: ${profile.registrationNumber || "N/A"}`;
-
-        return (
-          <div className="space-y-4">
-            <ProfileHeader name={name} subtitle={subtitle} role="hospital" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-                <p className="text-[10px] font-bold uppercase text-[#525866]">Departments & Specialization</p>
-                <p className="mt-2 font-bold text-[#111111]">{profile.hospitalType || "Trauma surgery, ICU, ER, General ward"}</p>
-              </div>
-              <div className="rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-                <p className="text-[10px] font-bold uppercase text-[#525866]">Paired Ambulances</p>
-                <p className="mt-2 font-bold text-[#111111]">{profile.ambulanceSupport === "Yes" ? "Direct Fleet Link Enabled" : "External Dispatch Only"}</p>
-              </div>
-              <div className="rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-                <p className="text-[10px] font-bold uppercase text-[#525866]">Operating Capacity</p>
-                <p className="mt-2 font-bold text-[#111111]">ICU Beds: {profile.icuCapacity || beds.icu} · ER Bays: {profile.erCapacity || beds.er}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
-      {tab === "settings" && (() => {
-        const [settings, setSettings] = useState([
-          { label: "Auto-accept critical cases", on: true },
-          { label: "Broadcast bed availability", on: true },
-          { label: "Alert when ICU below 20%", on: true },
-          { label: "Share vitals with ambulances", on: false },
-        ]);
-        return (
-          <SectionCard title="Hospital Settings" description="Sync with metropolitan dispatch">
-            <div className="space-y-4">
-              {settings.map((setting, i) => (
-                <div key={setting.label} className="flex items-center justify-between rounded-lg bg-[#F8F9FB] px-4 py-3">
-                  <span className="text-sm font-semibold text-[#111111]">{setting.label}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSettings((prev) => prev.map((s, idx) => idx === i ? { ...s, on: !s.on } : s))}
-                    className={`rounded-full px-3 py-1 text-[10px] font-bold transition-all cursor-pointer ${setting.on ? "bg-success/10 text-success hover:bg-success/20" : "bg-[#E5E7EB] text-[#525866] hover:bg-gray-200"}`}
-                  >
-                    {setting.on ? "ON" : "OFF"}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-        );
-      })()}
     </HospitalShell>
   );
 }

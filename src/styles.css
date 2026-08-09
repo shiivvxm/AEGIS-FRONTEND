@@ -188,3 +188,56 @@
   to { transform: rotate(360deg); }
 }
 @utility spin-slow { animation: spin-slow 12s linear infinite; }
+
+/* AEGIS Command Center Animations */
+@keyframes cctv-scan {
+  0% { top: 0%; opacity: 0.8; }
+  49% { top: 100%; opacity: 0.2; }
+  50% { top: 0%; opacity: 0; }
+  100% { top: 0%; opacity: 0; }
+}
+@utility animate-cctv-scan {
+  animation: cctv-scan 4s linear infinite;
+}
+
+@keyframes agent-processing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+}
+@utility animate-agent-processing {
+  animation: agent-processing 1.5s ease-in-out infinite;
+}
+
+@keyframes corridor-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@utility animate-corridor-flash {
+  animation: corridor-flash 1.2s ease-in-out infinite;
+}
+
+@keyframes blink-rec {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@utility animate-blink {
+  animation: blink-rec 1s step-end infinite;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@utility animate-slide-in {
+  animation: slide-in-right 0.3s ease-out both;
+}
+
+@keyframes scan-beam {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+@utility animate-scan-beam {
+  animation: scan-beam 5s infinite linear;
+}
+

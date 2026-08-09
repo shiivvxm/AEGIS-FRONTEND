@@ -10,6 +10,7 @@ import {
   Server,
   Shield,
   Users,
+  FileCheck,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -26,11 +27,13 @@ export type AdminTab =
   | "heatmaps"
   | "health"
   | "ai"
+  | "response-plan"
   | "profile";
 
 const TABS: { id: AdminTab; label: string; icon: LucideIcon }[] = [
   { id: "operations", label: "Operations", icon: LayoutGrid },
   { id: "emergencies", label: "Emergencies", icon: HeartPulse },
+  { id: "response-plan", label: "Response Plan", icon: FileCheck },
   { id: "hospitals", label: "Hospitals", icon: Building2 },
   { id: "ambulances", label: "Ambulances", icon: Ambulance },
   { id: "volunteers", label: "Volunteers", icon: Users },
