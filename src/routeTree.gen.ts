@@ -22,6 +22,7 @@ import { Route as AmbulanceRouteImport } from './routes/ambulance'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
 import { Route as RegisterVolunteerRouteImport } from './routes/register/volunteer'
+import { Route as RegisterTrafficRouteImport } from './routes/register/traffic'
 import { Route as RegisterHospitalRouteImport } from './routes/register/hospital'
 import { Route as RegisterCommandRouteImport } from './routes/register/command'
 import { Route as RegisterCitizenRouteImport } from './routes/register/citizen'
@@ -92,6 +93,11 @@ const RegisterVolunteerRoute = RegisterVolunteerRouteImport.update({
   path: '/register/volunteer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterTrafficRoute = RegisterTrafficRouteImport.update({
+  id: '/register/traffic',
+  path: '/register/traffic',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterHospitalRoute = RegisterHospitalRouteImport.update({
   id: '/register/hospital',
   path: '/register/hospital',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/register/citizen': typeof RegisterCitizenRoute
   '/register/command': typeof RegisterCommandRoute
   '/register/hospital': typeof RegisterHospitalRoute
+  '/register/traffic': typeof RegisterTrafficRoute
   '/register/volunteer': typeof RegisterVolunteerRoute
   '/register/': typeof RegisterIndexRoute
 }
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/register/citizen': typeof RegisterCitizenRoute
   '/register/command': typeof RegisterCommandRoute
   '/register/hospital': typeof RegisterHospitalRoute
+  '/register/traffic': typeof RegisterTrafficRoute
   '/register/volunteer': typeof RegisterVolunteerRoute
   '/register': typeof RegisterIndexRoute
 }
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/register/citizen': typeof RegisterCitizenRoute
   '/register/command': typeof RegisterCommandRoute
   '/register/hospital': typeof RegisterHospitalRoute
+  '/register/traffic': typeof RegisterTrafficRoute
   '/register/volunteer': typeof RegisterVolunteerRoute
   '/register/': typeof RegisterIndexRoute
 }
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/register/citizen'
     | '/register/command'
     | '/register/hospital'
+    | '/register/traffic'
     | '/register/volunteer'
     | '/register/'
   fileRoutesByTo: FileRoutesByTo
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/register/citizen'
     | '/register/command'
     | '/register/hospital'
+    | '/register/traffic'
     | '/register/volunteer'
     | '/register'
   id:
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/register/citizen'
     | '/register/command'
     | '/register/hospital'
+    | '/register/traffic'
     | '/register/volunteer'
     | '/register/'
   fileRoutesById: FileRoutesById
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   RegisterCitizenRoute: typeof RegisterCitizenRoute
   RegisterCommandRoute: typeof RegisterCommandRoute
   RegisterHospitalRoute: typeof RegisterHospitalRoute
+  RegisterTrafficRoute: typeof RegisterTrafficRoute
   RegisterVolunteerRoute: typeof RegisterVolunteerRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
 }
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterVolunteerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register/traffic': {
+      id: '/register/traffic'
+      path: '/register/traffic'
+      fullPath: '/register/traffic'
+      preLoaderRoute: typeof RegisterTrafficRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register/hospital': {
       id: '/register/hospital'
       path: '/register/hospital'
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterCitizenRoute: RegisterCitizenRoute,
   RegisterCommandRoute: RegisterCommandRoute,
   RegisterHospitalRoute: RegisterHospitalRoute,
+  RegisterTrafficRoute: RegisterTrafficRoute,
   RegisterVolunteerRoute: RegisterVolunteerRoute,
   RegisterIndexRoute: RegisterIndexRoute,
 }

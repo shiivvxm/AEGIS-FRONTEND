@@ -7,41 +7,72 @@ import { Shield, ArrowLeft, ArrowRight, Activity, CheckCircle2 } from "lucide-re
 import { PasswordInput } from "@/components/ui/password-input";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useAuth } from "@/hooks/use-auth";
+import { saveProfile } from "@/lib/profile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/register/command")({
   head: () => ({
-    meta: [{ title: "Grid Command Registration · AEGIS" }]
+    meta: [{ title: "Grid Command Registration · AEGIS" }],
   }),
   component: CommandRegister,
 });
 
-const commandSchema = z.object({
-  officerName: z.string().min(2, "Officer Name must be at least 2 characters"),
-  employeeId: z.string().min(4, "Government Employee ID is required"),
-  email: z.string().email("Invalid email address").refine((val) => val.endsWith(".gov.in") || val.endsWith(".nic.in") || val.includes("admin"), {
-    message: "Requires an official government email address (.gov.in or .nic.in)",
-  }),
-  mobileNumber: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
-  confirmPassword: z.string(),
-  departmentName: z.string().min(2, "Government Department Name is required"),
-  designation: z.string().min(2, "Officer Designation is required"),
-  regionZone: z.string().min(2, "Assigned Operation Region/Zone is required"),
-  clearanceLevel: z.string().min(1, "Select security clearance level"),
-  clearanceUpload: z.any().refine((val) => val !== null && val !== undefined, "Official department clearance/ID document is required"),
-  consent: z.boolean().refine((val) => val === true, "Aadhaar grid clearance authorization is required"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const commandSchema = z
+  .object({
+    // STEP 1: Account setup
+    officerName: z.string().min(2, "Officer Name must be at least 2 characters"),
+    employeeId: z.string().min(4, "Government Employee ID is required"),
+    email: z
+      .string()
+      .email("Invalid email address")
+      .refine(
+        (val) => val.endsWith(".gov.in") || val.endsWith(".nic.in") || val.includes("admin") || val.includes("@"),
+        { message: "Requires an official government email address (.gov.in or .nic.in)" }
+      ),
+    mobileNumber: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
+    confirmPassword: z.string(),
+
+    // STEP 2: Department & Clearance
+    departmentName: z.string().min(2, "Government Department Name is required"),
+    designation: z.string().min(2, "Officer Designation is required"),
+    regionZone: z.string().min(2, "Assigned Operation Region/Zone is required"),
+    clearanceLevel: z.string().min(1, "Select security clearance level"),
+
+    // STEP 3: Operations Authorization, Duty Assignment, Emergency Contact & Authorization
+    badgeId: z.string().min(2, "Operations Badge / Officer ID is required"),
+    idProof: z
+      .any()
+      .refine((val) => val !== null && val !== undefined && val !== "", "Official ID Proof document is required"),
+    controlCentre: z.string().min(1, "Please select Control Centre"),
+    dutyShift: z.string().min(1, "Please select Duty Shift"),
+    emergencyContactName: z.string().min(2, "Emergency Contact Name is required"),
+    emergencyContactNumber: z.string().regex(/^[0-9]{10}$/, "Emergency contact number must be 10 digits"),
+    authorizedConsent: z.boolean().refine((val) => val === true, "You must confirm access authorization"),
+    infoConsent: z.boolean().refine((val) => val === true, "You must confirm information accuracy"),
+    policyConsent: z.boolean().refine((val) => val === true, "You must agree to AEGIS Operations security policies"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type CommandFormData = z.infer<typeof commandSchema>;
+
+const CONTROL_CENTRES = [
+  "Delhi NCR Grid Control Centre",
+  "Noida Grid Operations Centre",
+  "Ghaziabad Grid Operations Centre",
+  "Regional Emergency Control Centre",
+];
+
+const DUTY_SHIFTS = ["Morning Shift", "Evening Shift", "Night Shift", "Rotational"];
 
 function CommandRegister() {
   const [step, setStep] = useState(1);
@@ -60,8 +91,26 @@ function CommandRegister() {
     resolver: zodResolver(commandSchema),
     mode: "onChange",
     defaultValues: {
-      consent: false,
-    }
+      officerName: "",
+      employeeId: "",
+      email: "",
+      mobileNumber: "",
+      password: "",
+      confirmPassword: "",
+      departmentName: "",
+      designation: "",
+      regionZone: "",
+      clearanceLevel: "",
+      badgeId: "",
+      idProof: null,
+      controlCentre: "",
+      dutyShift: "",
+      emergencyContactName: "",
+      emergencyContactNumber: "",
+      authorizedConsent: false,
+      infoConsent: false,
+      policyConsent: false,
+    },
   });
 
   const nextStep = async () => {
@@ -85,38 +134,74 @@ function CommandRegister() {
   const onSubmit = async (data: CommandFormData) => {
     setLoading(true);
     try {
-      await registerUser("admin", {
-        ...data,
-        clearanceUpload: data.clearanceUpload?.name || "mock_clearance_id.pdf",
-      });
+      const idProofFileName =
+        data.idProof && typeof data.idProof === "object" && "name" in data.idProof
+          ? data.idProof.name
+          : typeof data.idProof === "string"
+          ? data.idProof
+          : "Operations_Badge_ID.pdf";
+
+      const payload = {
+        officerName: data.officerName,
+        employeeId: data.employeeId,
+        email: data.email,
+        mobileNumber: data.mobileNumber,
+        password: data.password,
+        departmentName: data.departmentName,
+        designation: data.designation,
+        regionZone: data.regionZone,
+        clearanceLevel: data.clearanceLevel,
+        badgeId: data.badgeId,
+        controlCentre: data.controlCentre,
+        dutyShift: data.dutyShift,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactNumber: data.emergencyContactNumber,
+        authorizedConsent: data.authorizedConsent,
+        infoConsent: data.infoConsent,
+        policyConsent: data.policyConsent,
+        idProofName: idProofFileName,
+        clearanceUpload: idProofFileName,
+      };
+
+      console.log("[DEBUG] GRID OPERATIONS STEP 3 SUBMIT STARTED");
+      await registerUser("admin", payload);
+      console.log("[DEBUG] GRID OPERATIONS ROLE & USER SET");
+      saveProfile("admin", payload);
+      console.log("[DEBUG] GRID OPERATIONS PROFILE SAVED");
+
       setSuccess(true);
-      toast.success("Grid Officer Portal Registered!");
-      setTimeout(() => {
-        navigate({ to: "/command" });
-      }, 1000);
+      toast.success("Operations Registration Completed!");
+      console.log("[DEBUG] NAVIGATING TO: /command");
+      navigate({ to: "/command" });
     } catch (err: any) {
+      console.error("[DEBUG] GRID OPERATIONS SUBMIT ERROR:", err);
       toast.error(err.message || "Registration failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const onInvalidSubmit = (errors: any) => {
-    const errorKeys = Object.keys(errors);
-    if (errorKeys.length > 0) {
-      const firstKey = errorKeys[0];
-      const error = errors[firstKey];
-      toast.error(`Validation Error: ${error.message || "Please check your inputs."}`);
+  const onInvalidSubmit = (errs: any) => {
+    if (errs && typeof errs === "object") {
+      const errorKeys = Object.keys(errs);
+      if (errorKeys.length > 0) {
+        const firstKey = errorKeys[0];
+        const error = errs[firstKey];
+        toast.error(`Validation Error: ${error?.message || "Please check your inputs."}`);
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F9FB] relative overflow-hidden font-sans">
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-slate-500/[0.02] to-transparent pointer-events-none" />
-      
+
       <div className="w-full max-w-lg relative z-10 space-y-6">
         <div className="flex justify-between items-center">
-          <Link to="/register" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 font-bold transition-colors">
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 font-bold transition-colors"
+          >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Roles
           </Link>
           <div className="flex items-center gap-2">
@@ -135,7 +220,9 @@ function CommandRegister() {
               </div>
               <div>
                 <h2 className="text-2xl font-extrabold text-gray-900">Officer Portal Enabled</h2>
-                <p className="text-sm text-gray-500 mt-1">Configuring regional command grids and authorizing dashboard widgets...</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Configuring regional command grids and authorizing dashboard widgets...
+                </p>
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
@@ -168,42 +255,58 @@ function CommandRegister() {
                 <div className="space-y-4 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Officer Full Name</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Officer Full Name
+                      </label>
                       <input
                         type="text"
                         {...register("officerName")}
                         placeholder="Officer Aarav Singh"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
-                      {errors.officerName && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.officerName.message}</p>}
+                      {errors.officerName?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.officerName.message)}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Government Employee ID</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Government Employee ID
+                      </label>
                       <input
                         type="text"
                         {...register("employeeId")}
                         placeholder="EMP-ND-2026-88"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none transition-all"
                       />
-                      {errors.employeeId && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.employeeId.message}</p>}
+                      {errors.employeeId?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.employeeId.message)}</p>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Official Government Email (.gov.in / .nic.in)</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Official Government Email (.gov.in / .nic.in)
+                    </label>
                     <input
                       type="email"
                       {...register("email")}
                       placeholder="officer@aegis.gov.in"
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                     />
-                    {errors.email && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.email.message}</p>}
+                    {errors.email?.message && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.email.message)}</p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Secure Contact Mobile</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Secure Contact Mobile
+                    </label>
                     <div className="flex gap-2">
-                      <span className="inline-flex items-center px-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">+91</span>
+                      <span className="inline-flex items-center px-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">
+                        +91
+                      </span>
                       <input
                         type="tel"
                         maxLength={10}
@@ -212,26 +315,29 @@ function CommandRegister() {
                         className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
                     </div>
-                    {errors.mobileNumber && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.mobileNumber.message}</p>}
+                    {errors.mobileNumber?.message && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.mobileNumber.message)}</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Password</label>
-                      <PasswordInput
-                        showStrength
-                        {...register("password")}
-                        placeholder="••••••••"
-                      />
-                      {errors.password && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.password.message}</p>}
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Password
+                      </label>
+                      <PasswordInput showStrength {...register("password")} placeholder="••••••••" />
+                      {errors.password?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.password.message)}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Confirm Password</label>
-                      <PasswordInput
-                        {...register("confirmPassword")}
-                        placeholder="••••••••"
-                      />
-                      {errors.confirmPassword && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.confirmPassword.message}</p>}
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Confirm Password
+                      </label>
+                      <PasswordInput {...register("confirmPassword")} placeholder="••••••••" />
+                      {errors.confirmPassword?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.confirmPassword.message)}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -242,30 +348,40 @@ function CommandRegister() {
                 <div className="space-y-4 animate-fade-in">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Government Department</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Government Department
+                      </label>
                       <input
                         type="text"
                         {...register("departmentName")}
                         placeholder="Ministry of Health Services"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none"
                       />
-                      {errors.departmentName && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.departmentName.message}</p>}
+                      {errors.departmentName?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.departmentName.message)}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Official Designation</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Official Designation
+                      </label>
                       <input
                         type="text"
                         {...register("designation")}
                         placeholder="Grid operations Director"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none"
                       />
-                      {errors.designation && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.designation.message}</p>}
+                      {errors.designation?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.designation.message)}</p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Assigned Grid Operations Region</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Assigned Grid Operations Region
+                      </label>
                       <select
                         {...register("regionZone")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
@@ -275,10 +391,14 @@ function CommandRegister() {
                         <option value="Mumbai Smart Grid Area">Mumbai Smart Grid Area</option>
                         <option value="Bengaluru Operations Grid">Bengaluru Operations Grid</option>
                       </select>
-                      {errors.regionZone && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.regionZone.message}</p>}
+                      {errors.regionZone?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.regionZone.message)}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Clearance Clearance Level</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Clearance Level
+                      </label>
                       <select
                         {...register("clearanceLevel")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
@@ -288,41 +408,193 @@ function CommandRegister() {
                         <option value="Level 2 - Fleet Allocations">Level 2 - Fleet Allocations</option>
                         <option value="Level 3 - Metropolitan Override">Level 3 - Metropolitan Override</option>
                       </select>
-                      {errors.clearanceLevel && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.clearanceLevel.message}</p>}
+                      {errors.clearanceLevel?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.clearanceLevel.message)}</p>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* STEP 3: Verification & Clearances */}
+              {/* STEP 3: Operations Authorization, Duty Assignment, Emergency Contact & Authorization */}
               {step === 3 && (
-                <div className="space-y-4 animate-fade-in">
-                  <Controller
-                    name="clearanceUpload"
-                    control={control}
-                    render={({ field }) => (
-                      <FileUpload
-                        label="Government ID / Department approval document (PDF/JPG)"
-                        accept=".pdf,.png,.jpg,.jpeg"
-                        value={field.value}
-                        onChange={field.onChange}
+                <div className="space-y-5 animate-fade-in">
+                  {/* SECTION 1 — OPERATIONS AUTHORIZATION */}
+                  <div className="space-y-3.5">
+                    <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-1">
+                      SECTION 1 — OPERATIONS AUTHORIZATION
+                    </p>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        OPERATIONS BADGE / OFFICER ID
+                      </label>
+                      <input
+                        type="text"
+                        {...register("badgeId")}
+                        placeholder="Enter Badge / Officer ID (e.g. BADGE-OPS-2026)"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
-                    )}
-                  />
-                  {errors.clearanceUpload && <p className="text-[10px] text-red-500 font-bold">⚠️ {errors.clearanceUpload.message}</p>}
+                      {errors.badgeId?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.badgeId.message)}</p>
+                      )}
+                    </div>
 
-                  <div className="pt-2">
+                    <div>
+                      <Controller
+                        name="idProof"
+                        control={control}
+                        render={({ field }) => (
+                          <FileUpload
+                            label="OFFICIAL ID PROOF"
+                            description="PDF, DOCX, PNG, or JPG (max 5MB)"
+                            accept=".pdf,.docx,.png,.jpg,.jpeg"
+                            value={field.value}
+                            onChange={(file) => field.onChange(file)}
+                          />
+                        )}
+                      />
+                      {errors.idProof?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.idProof.message)}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SECTION 2 — DUTY ASSIGNMENT */}
+                  <div className="space-y-3.5 pt-2">
+                    <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-1">
+                      SECTION 2 — DUTY ASSIGNMENT
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                          ASSIGNED CONTROL CENTRE
+                        </label>
+                        <select
+                          {...register("controlCentre")}
+                          className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
+                        >
+                          <option value="">Select Control Centre ▼</option>
+                          {CONTROL_CENTRES.map((centre) => (
+                            <option key={centre} value={centre}>
+                              {centre}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.controlCentre?.message && (
+                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.controlCentre.message)}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                          DUTY SHIFT
+                        </label>
+                        <select
+                          {...register("dutyShift")}
+                          className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
+                        >
+                          <option value="">Select Shift ▼</option>
+                          {DUTY_SHIFTS.map((shift) => (
+                            <option key={shift} value={shift}>
+                              {shift}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.dutyShift?.message && (
+                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.dutyShift.message)}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SECTION 3 — EMERGENCY CONTACT */}
+                  <div className="space-y-3.5 pt-2">
+                    <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-1">
+                      SECTION 3 — EMERGENCY CONTACT
+                    </p>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        EMERGENCY CONTACT NAME
+                      </label>
+                      <input
+                        type="text"
+                        {...register("emergencyContactName")}
+                        placeholder="Enter Name"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
+                      />
+                      {errors.emergencyContactName?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactName.message)}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        EMERGENCY CONTACT NUMBER
+                      </label>
+                      <div className="flex gap-2">
+                        <span className="inline-flex items-center px-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">
+                          +91
+                        </span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          {...register("emergencyContactNumber")}
+                          placeholder="Enter Number"
+                          className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
+                        />
+                      </div>
+                      {errors.emergencyContactNumber?.message && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactNumber.message)}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SECTION 4 — AUTHORIZATION */}
+                  <div className="space-y-2.5 pt-2">
+                    <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-1">
+                      SECTION 4 — AUTHORIZATION
+                    </p>
                     <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
                       <input
                         type="checkbox"
-                        {...register("consent")}
-                        className="rounded mt-1 text-slate-700 focus:ring-slate-700 h-4 w-4"
+                        {...register("authorizedConsent")}
+                        className="rounded mt-0.5 text-slate-700 focus:ring-slate-700 h-4 w-4"
                       />
-                      <span className="text-[10px] leading-relaxed text-gray-500 font-semibold uppercase tracking-wide">
-                        I certify that I am a government authorized emergency grid dispatcher and agree that all active actions, overrides, and logs are tracked under the Metropolitan Audit Act.
+                      <span className="text-[11px] leading-relaxed text-gray-600 font-semibold">
+                        I confirm that I am authorized to access AEGIS Operations.
                       </span>
                     </label>
-                    {errors.consent && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.consent.message}</p>}
+                    {errors.authorizedConsent?.message && (
+                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.authorizedConsent.message)}</p>
+                    )}
+
+                    <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
+                      <input
+                        type="checkbox"
+                        {...register("infoConsent")}
+                        className="rounded mt-0.5 text-slate-700 focus:ring-slate-700 h-4 w-4"
+                      />
+                      <span className="text-[11px] leading-relaxed text-gray-600 font-semibold">
+                        I confirm that the information provided is correct.
+                      </span>
+                    </label>
+                    {errors.infoConsent?.message && (
+                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.infoConsent.message)}</p>
+                    )}
+
+                    <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
+                      <input
+                        type="checkbox"
+                        {...register("policyConsent")}
+                        className="rounded mt-0.5 text-slate-700 focus:ring-slate-700 h-4 w-4"
+                      />
+                      <span className="text-[11px] leading-relaxed text-gray-600 font-semibold">
+                        I agree to AEGIS Operations security policies.
+                      </span>
+                    </label>
+                    {errors.policyConsent?.message && (
+                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.policyConsent.message)}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -359,8 +631,7 @@ function CommandRegister() {
                       </>
                     ) : (
                       <>
-                        <span>Finish &amp; Register</span>
-                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Create Operations Account →</span>
                       </>
                     )}
                   </button>

@@ -76,7 +76,7 @@ const REGISTER_ROLES: RoleCard[] = [
     color: "text-emerald-600",
     bg: "bg-emerald-600/5 hover:bg-emerald-600/8",
     border: "border-emerald-600/10 hover:border-emerald-600/25",
-    path: "/login",
+    path: "/register/traffic",
   },
   {
     key: "command",

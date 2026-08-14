@@ -809,23 +809,99 @@ function TrafficPortal() {
       ═══════════════════════════════════════════════════════════════ */}
       {tab === "profile" && (() => {
         const profile = getProfile("traffic");
-        const name = getDisplayName("traffic", user);
+        const name = profile.fullName || profile.officerName || profile.name || getDisplayName("traffic", user);
+        const designation = profile.designation || "Traffic Police Officer";
+        const officerId = profile.officerId || profile.employeeId || profile.badgeId || "TP-DEL-10482";
+        const trafficUnit = profile.trafficUnit || "Delhi Traffic Control Unit";
+        const controlCenter = profile.controlCenter || "Sector 62 Traffic Control Center";
+        const zone = profile.zone || "Sector 62 / NH-24";
+        const city = profile.city || "Delhi NCR";
+        const dutyShift = profile.dutyShift || "Rotational";
+        const email = profile.email || user?.email || "officer@traffic.aegis.gov.in";
+        const mobile = profile.mobileNumber || profile.phone || user?.mobileNumber || "9876543218";
+        const emergencyContact = profile.emergencyContact;
+        const badgeId = profile.badgeId || officerId;
 
         return (
-          <div className="max-w-xl mx-auto space-y-4">
-            <ProfileHeader name={name} subtitle="Traffic Control Officer · Badge TRF-9021 · Noida Sector 62" role="traffic" />
-            <div className="space-y-3">
-              {[
-                { label: "Assigned Sector", value: "Sector 62 & NH-24 Corridor" },
-                { label: "Clearance Level", value: "Level 2 Traffic & Signal Override Clearance" },
-                { label: "Duty Shift", value: "08:00 – 20:00 (Active Duty)" },
-                { label: "Corridors Cleared Today", value: "14 Emergency Corridors" },
-              ].map((row) => (
-                <div key={row.label} className="rounded-2xl bg-[#131926]/80 border border-[#242E42] p-4">
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{row.label}</p>
-                  <p className="text-xs font-bold text-white mt-1">{row.value}</p>
+          <div className="max-w-2xl mx-auto space-y-5">
+            <div className="rounded-3xl bg-[#131926]/90 border border-[#242E42] p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between border-b border-[#242E42] pb-6">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-2xl font-black text-emerald-400">
+                    {name.split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-extrabold text-white">{name}</h2>
+                      <span className="rounded-full bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-0.5 text-[9px] font-extrabold text-emerald-400 uppercase">
+                        Verified / Active
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-emerald-400 mt-0.5">{designation}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5 font-mono">Officer ID: {officerId}</p>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Officer / Employee ID</p>
+                  <p className="text-sm font-bold text-white mt-1 font-mono">{officerId}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Designation</p>
+                  <p className="text-sm font-bold text-emerald-400 mt-1">{designation}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Traffic Unit</p>
+                  <p className="text-sm font-bold text-white mt-1">{trafficUnit}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Control Center / Station</p>
+                  <p className="text-sm font-bold text-white mt-1">{controlCenter}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Assigned Zone / Sector</p>
+                  <p className="text-sm font-bold text-white mt-1">{zone}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">City</p>
+                  <p className="text-sm font-bold text-white mt-1">{city}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Duty Shift</p>
+                  <p className="text-sm font-bold text-cyan-400 mt-1">{dutyShift}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Badge Number</p>
+                  <p className="text-sm font-bold text-white mt-1 font-mono">{badgeId}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Official Email</p>
+                  <p className="text-sm font-bold text-white mt-1 truncate">{email}</p>
+                </div>
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Mobile Number</p>
+                  <p className="text-sm font-bold text-white mt-1 font-mono">+91 {mobile}</p>
+                </div>
+              </div>
+
+              {emergencyContact && (
+                <div className="rounded-2xl bg-[#161D2D]/60 border border-[#242E42] p-4">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Emergency Contact Number</p>
+                  <p className="text-sm font-bold text-white mt-1 font-mono">+91 {emergencyContact}</p>
+                </div>
+              )}
+
+              {profile.idUploadName && (
+                <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Submitted Identification Document</p>
+                    <p className="text-xs font-bold text-white mt-0.5">{profile.idUploadName}</p>
+                  </div>
+                  <span className="rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1">Document selected</span>
+                </div>
+              )}
             </div>
           </div>
         );

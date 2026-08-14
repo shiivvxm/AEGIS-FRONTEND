@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 // Stylized animated tactical map (SVG) — works without external map APIs
 export interface MapMarker {
   id: string;
-  type: "emergency" | "ambulance" | "hospital" | "volunteer" | "signal";
+  type: "emergency" | "citizen" | "ambulance" | "hospital" | "volunteer" | "signal" | "traffic" | "command" | (string & {});
   x: number; // 0-100
   y: number; // 0-100
   label?: string;
@@ -73,8 +73,8 @@ export function LiveMap({ markers = [], route, className, showGrid = true, showC
 
       {/* markers */}
       <div className="absolute inset-0">
-        {markers.map((m) => (
-          <Marker key={m.id} marker={m} dark={dark} />
+        {(markers || []).map((m) => (
+          <Marker key={m.id || Math.random().toString()} marker={m} dark={dark} />
         ))}
       </div>
 
@@ -95,30 +95,36 @@ export function LiveMap({ markers = [], route, className, showGrid = true, showC
   );
 }
 
-
 function buildPath(route: NonNullable<LiveMapProps["route"]>) {
   const pts = [route.from, ...(route.via ?? []), route.to];
   return pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]} ${p[1]}`).join(" ");
 }
 
 function Marker({ marker, dark }: { marker: MapMarker; dark?: boolean }) {
-  const style = { left: `${marker.x}%`, top: `${marker.y}%` };
-  const config = {
+  const style = { left: `${marker?.x ?? 50}%`, top: `${marker?.y ?? 50}%` };
+
+  const markerConfigs: Record<string, { color: string; ring: string; glyph: string }> = {
     emergency: { color: "bg-[#E63946] text-white", ring: "bg-[#E63946]/45", glyph: "✚" },
+    citizen: { color: "bg-[#E63946] text-white", ring: "bg-[#E63946]/45", glyph: "👤" },
     ambulance: { color: "bg-[#00E5FF] text-[#080C14]", ring: "bg-[#00E5FF]/40", glyph: "🚑" },
     hospital: { color: "bg-[#22C55E] text-white", ring: "bg-[#22C55E]/45", glyph: "H" },
     volunteer: { color: "bg-purple-500 text-white", ring: "bg-purple-500/45", glyph: "★" },
     signal: { color: "bg-[#22C55E] text-white", ring: "bg-[#22C55E]/45", glyph: "●" },
-  }[marker.type];
+    traffic: { color: "bg-emerald-500 text-white", ring: "bg-emerald-500/45", glyph: "🚥" },
+    command: { color: "bg-slate-700 text-white", ring: "bg-slate-700/45", glyph: "🛡️" },
+  };
+
+  const defaultConfig = { color: "bg-purple-500 text-white", ring: "bg-purple-500/45", glyph: "📍" };
+  const config = (marker && marker.type ? markerConfigs[marker.type] : undefined) ?? defaultConfig;
 
   return (
     <div className="absolute -translate-x-1/2 -translate-y-1/2" style={style}>
       <div className="relative">
-        {marker.active && <span className={cn("absolute inset-0 -m-1 rounded-full ping-ring", config.ring)} />}
+        {marker?.active && <span className={cn("absolute inset-0 -m-1 rounded-full ping-ring", config.ring)} />}
         <div className={cn("relative grid h-6 w-6 place-items-center rounded-full text-[10px] font-bold shadow-md border border-white/20", config.color)}>
           {config.glyph}
         </div>
-        {marker.label && (
+        {marker?.label && (
           <div className={cn(
             "absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[9px] font-extrabold shadow-sm backdrop-blur",
             dark ? "border-[#242E42] bg-[#131926]/90 text-white" : "border-gray-150 bg-white/95 text-gray-700"

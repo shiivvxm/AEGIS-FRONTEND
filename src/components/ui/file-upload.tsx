@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UploadCloud, File, X, Image as ImageIcon, CheckCircle2 } from "lucide-react";
+import { UploadCloud, File as FileIcon, X, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileUploadProps {
@@ -7,10 +7,22 @@ interface FileUploadProps {
   description?: string;
   accept?: string;
   maxSizeMB?: number;
-  value?: File | null | string;
+  value?: File | null | string | any;
   onChange: (file: File | null) => void;
   className?: string;
 }
+
+const isFileObject = (val: any): boolean => {
+  if (!val || typeof val !== "object") return false;
+  try {
+    if (typeof File !== "undefined" && typeof File === "function" && val instanceof File) {
+      return true;
+    }
+  } catch {
+    // ignore instanceof check error if File is non-callable
+  }
+  return typeof val.name === "string";
+};
 
 export function FileUpload({
   label,
@@ -28,21 +40,27 @@ export function FileUpload({
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Initialize previews if default string value (e.g. existing mockup URL) is supplied
+  // Initialize previews safely
   React.useEffect(() => {
     if (typeof value === "string") {
       setFileName(value.split("/").pop() || "Accreditation_Doc.pdf");
       if (value.match(/\.(jpeg|jpg|gif|png)$/i)) {
         setFilePreview(value);
+      } else {
+        setFilePreview(null);
       }
-    } else if (value instanceof File) {
+    } else if (isFileObject(value)) {
       setFileName(value.name);
-      if (value.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFilePreview(reader.result as string);
-        };
-        reader.readAsDataURL(value);
+      if (value.type && typeof value.type === "string" && value.type.startsWith("image/")) {
+        try {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFilePreview(reader.result as string);
+          };
+          reader.readAsDataURL(value);
+        } catch {
+          setFilePreview(null);
+        }
       } else {
         setFilePreview(null);
       }
@@ -64,7 +82,7 @@ export function FileUpload({
 
   const validateFile = (file: File): boolean => {
     setError(null);
-    
+
     // Check file size
     const sizeInMB = file.size / (1024 * 1024);
     if (sizeInMB > maxSizeMB) {
@@ -75,8 +93,12 @@ export function FileUpload({
     // Check extension / mimetype
     const fileExt = `.${file.name.split(".").pop()?.toLowerCase()}`;
     const acceptedTypes = accept.split(",").map((t) => t.trim().toLowerCase());
-    
-    if (accept && !acceptedTypes.includes(fileExt) && !acceptedTypes.some(type => file.type.includes(type.replace('*', '')))) {
+
+    if (
+      accept &&
+      !acceptedTypes.includes(fileExt) &&
+      !acceptedTypes.some((type) => file.type.includes(type.replace("*", "")))
+    ) {
       setError(`Invalid file type. Supported types: ${accept}`);
       return false;
     }
@@ -125,7 +147,7 @@ export function FileUpload({
       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
         {label}
       </label>
-      
+
       <div
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -156,7 +178,7 @@ export function FileUpload({
                 </div>
               ) : (
                 <div className="h-12 w-12 rounded-lg bg-green-50 border border-green-100 flex items-center justify-center text-green-600 shrink-0">
-                  <File className="h-6 w-6" />
+                  <FileIcon className="h-6 w-6" />
                 </div>
               )}
               <div className="text-left min-w-0">
@@ -168,7 +190,7 @@ export function FileUpload({
                 </span>
               </div>
             </div>
-            
+
             <button
               type="button"
               onClick={removeFile}
@@ -191,7 +213,7 @@ export function FileUpload({
           </div>
         )}
       </div>
-      
+
       {error && (
         <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1 animate-fade-in">
           ⚠️ {error}

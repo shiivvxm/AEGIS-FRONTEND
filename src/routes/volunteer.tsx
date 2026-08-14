@@ -31,7 +31,7 @@ function VolunteerPortal() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || user?.role !== "volunteer")) {
+    if (!isLoading && (!isAuthenticated || user?.role?.toLowerCase() !== "volunteer")) {
       navigate({ to: "/login" });
     }
   }, [isAuthenticated, user, isLoading, navigate]);
@@ -41,7 +41,7 @@ function VolunteerPortal() {
   const [arrived, setArrived] = useState(false);
   const [completed, setCompleted] = useState(false);
 
-  if (isLoading || !isAuthenticated || user?.role !== "volunteer") {
+  if (isLoading || !isAuthenticated || user?.role?.toLowerCase() !== "volunteer") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="h-6 w-6 animate-ping bg-purple-600 rounded-full" />
@@ -78,125 +78,107 @@ function VolunteerPortal() {
                 </span>
                 <SeverityBadge severity="critical" />
               </div>
-              <h2 className="mt-3 text-lg font-bold text-[#111111]">Cardiac Arrest · Sector 62</h2>
-              <p className="mt-1 text-sm text-[#525866]">
+              <h3 className="mt-2 text-lg font-extrabold text-[#111111]">Cardiac Arrest — Sector 62</h3>
+              <p className="mt-1 text-xs text-[#525866]">
                 Male, ~56 years. Ambulance ETA 4m. CPR assistance needed immediately.
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <span className="rounded-full bg-[#F8F9FB] px-2.5 py-0.5 text-[10px] font-semibold text-[#525866]">CPR Certified</span>
-                <span className="rounded-full bg-[#F8F9FB] px-2.5 py-0.5 text-[10px] font-semibold text-[#525866]">AED @ Metro Gate 2</span>
-              </div>
-              <div className="mt-4 flex gap-2">
-                {!accepted ? (
-                  <>
-                    <button type="button" onClick={() => setAccepted(true)} className="flex-1 rounded-xl bg-[#E63946] py-2.5 text-sm font-bold text-white">
-                      Accept Response
+              {!accepted ? (
+                <button
+                  onClick={() => {
+                    setAccepted(true);
+                    toast.success("Incident accepted! Route to victim highlighted.");
+                  }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 text-sm font-bold text-white shadow-md hover:bg-purple-700 active:scale-[0.98] transition-all"
+                >
+                  <Play className="h-4 w-4" /> Accept Dispatch (Respond Now)
+                </button>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  {!arrived ? (
+                    <button
+                      onClick={() => {
+                        setArrived(true);
+                        toast.info("Marked as arrived at victim location.");
+                      }}
+                      className="w-full rounded-xl bg-warning p-3 text-xs font-bold text-black"
+                    >
+                      Mark Arrived at Location
                     </button>
-                    <button type="button" onClick={() => toast.info("Incident declined. Request returned to dispatch queue.")} className="rounded-xl px-4 py-2.5 text-sm font-bold text-[#525866] ring-1 ring-[#E5E7EB] hover:bg-slate-50 transition-colors">
-                      Decline
+                  ) : !completed ? (
+                    <button
+                      onClick={handleComplete}
+                      className="w-full rounded-xl bg-success p-3 text-xs font-bold text-white"
+                    >
+                      Complete Handover (+50 pts)
                     </button>
-                  </>
-                ) : !arrived ? (
-                  <button type="button" onClick={() => setArrived(true)} className="flex-1 rounded-xl bg-medical py-2.5 text-sm font-bold text-white">
-                    I've Arrived on Scene
-                  </button>
-                ) : !completed ? (
-                  <button type="button" onClick={handleComplete} className="flex-1 rounded-xl bg-success py-2.5 text-sm font-bold text-white">
-                    Mark Assistance Complete
-                  </button>
-                ) : (
-                  <div className="flex-1 rounded-xl bg-success/10 py-2.5 text-center text-sm font-bold text-success">
-                    +50 points · Thank you for saving a life
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <div className="rounded-xl bg-success/10 p-3 text-center text-xs font-bold text-success">
+                      ✓ Response Complete · Handover Logged
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-
-            <SectionCard title="Navigation Assistance" description="Fastest route to incident">
-              <LiveMap
-                className="h-[200px]"
-                markers={[
-                  { id: "inc", type: "emergency", x: 50, y: 50, label: "Incident", active: true },
-                  { id: "me", type: "volunteer", x: 38, y: 58, label: "You", active: true },
-                  { id: "amb", type: "ambulance", x: 70, y: 30, label: "AMB-1083", active: true },
-                ]}
-              />
+            <SectionCard title="Active Responders Nearby">
+              <div className="space-y-2 text-xs text-[#525866]">
+                <p>● 3 volunteers within 1km (CPR Certified)</p>
+                <p>● 1 AED unit at Sector 62 Metro Station (300m)</p>
+              </div>
             </SectionCard>
           </div>
-
-          <SectionCard title="Nearby Emergency Alerts" description="Within 2 km radius">
-            {[
-              { id: "EMG-1258", type: "Cardiac Arrest", dist: "0.8 km", match: "CPR", active: true },
-              { id: "EMG-1264", type: "Arterial Bleeding", dist: "1.4 km", match: "First Aid", active: false },
-            ].map((inc) => (
-              <div key={inc.id} className="mb-3 flex items-center justify-between rounded-xl bg-[#F8F9FB] p-4 last:mb-0">
-                <div>
-                  <p className="text-sm font-bold text-[#111111]">{inc.id} · {inc.type}</p>
-                  <p className="text-xs text-[#525866]">{inc.dist} · Skill: {inc.match}</p>
-                </div>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${inc.active ? "bg-[#E63946]/10 text-[#E63946]" : "bg-[#E5E7EB] text-[#525866]"}`}>
-                  {inc.active ? "Active" : "Assigned"}
-                </span>
-              </div>
-            ))}
-          </SectionCard>
-        </div>
-      )}
-
-      {tab === "requests" && (
-        <div className="space-y-4">
-          <p className="text-sm text-[#525866]">Skill-matched requests awaiting your response</p>
-          {[
-            { type: "CPR Request", location: "Sector 62 Market", skill: "CPR Certified", urgent: true },
-            { type: "First Aid Request", location: "GT Road Crossing", skill: "First Aid Specialist", urgent: false },
-            { type: "AED Deployment", location: "Indirapuram Plaza", skill: "AED Trained", urgent: false },
-          ].map((req) => (
-            <div key={req.location} className="flex items-center justify-between rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-              <div>
-                <p className="font-bold text-[#111111]">{req.type}</p>
-                <p className="text-sm text-[#525866]">{req.location}</p>
-                <p className="mt-1 text-xs text-medical">{req.skill}</p>
-              </div>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => toast.success(`Accepted: ${req.type} at ${req.location}. Navigating to scene...`)} className="rounded-lg bg-[#E63946] px-4 py-2 text-xs font-bold text-white hover:bg-[#C32F3A] transition-colors">Accept</button>
-                <button type="button" onClick={() => toast.info(`Declined: ${req.type}. Request returned to queue.`)} className="rounded-lg px-4 py-2 text-xs font-bold text-[#525866] ring-1 ring-[#E5E7EB] hover:bg-slate-50 transition-colors">Decline</button>
-              </div>
-            </div>
-          ))}
+          <div className="h-[450px] lg:h-auto min-h-[400px]">
+            <LiveMap
+              center={[77.3649, 28.6280]}
+              zoom={14}
+              markers={[
+                { id: "vic", type: "citizen", x: 50, y: 50, label: "Victim (Sector 62)", active: true },
+                { id: "vol", type: "volunteer", x: 45, y: 55, label: "You (Volunteer)", active: true },
+                { id: "amb", type: "ambulance", x: 70, y: 30, label: "AMB-1083", active: true },
+              ]}
+              showRoute
+              routeType="volunteer"
+            />
+          </div>
         </div>
       )}
 
       {tab === "training" && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {[
-            { title: "Bystander CPR Refresher", progress: 100, duration: "45 min" },
-            { title: "AED Deployment Guide", progress: 75, duration: "30 min" },
-            { title: "Hemorrhage Control", progress: 20, duration: "60 min" },
-            { title: "Pediatric First Aid", progress: 0, duration: "90 min" },
-          ].map((course) => (
-            <div key={course.title} className="rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-              <div className="flex items-start justify-between">
-                <BookOpen className="h-5 w-5 text-medical" />
-                <span className="text-[10px] font-bold text-[#525866]">{course.duration}</span>
-              </div>
-              <p className="mt-3 font-bold text-[#111111]">{course.title}</p>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#F8F9FB]">
-                <div className="h-full bg-medical" style={{ width: `${course.progress}%` }} />
-              </div>
-              <p className="mt-1 text-xs text-[#525866]">{course.progress}% complete</p>
-              <button type="button" onClick={() => toast.success(course.progress === 100 ? `Reviewing: ${course.title}` : `Continuing: ${course.title} — ${course.progress}% done`)} className="mt-3 flex items-center gap-1.5 text-xs font-bold text-medical hover:underline transition-all">
-                <Play className="h-3.5 w-3.5" /> {course.progress === 100 ? "Review" : "Continue"}
-              </button>
+        <div className="space-y-4">
+          <SectionCard title="Certified Training Modules">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { title: "Bystander CPR & AED Basics", level: "Beginner", time: "15 mins", done: true },
+                { title: "Trauma Bleeding Control (STOP THE BLEED)", level: "Intermediate", time: "20 mins", done: true },
+                { title: "Overdose & Naloxone Response", level: "Advanced", time: "25 mins", done: false },
+                { title: "Crowd Control & Triage Communication", level: "Intermediate", time: "15 mins", done: false },
+              ].map((m) => (
+                <div key={m.title} className="rounded-xl bg-white p-4 ring-1 ring-[#E5E7EB] flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-purple-600">{m.level} · {m.time}</span>
+                    <h4 className="text-sm font-bold text-[#111111]">{m.title}</h4>
+                  </div>
+                  {m.done ? (
+                    <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
+                  ) : (
+                    <button
+                      onClick={() => toast.info(`Started course: ${m.title}`)}
+                      className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-purple-700"
+                    >
+                      Start
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          </SectionCard>
         </div>
       )}
 
-      {tab === "achievements" && (
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl bg-gradient-to-br from-[#E63946]/10 to-transparent p-5 ring-1 ring-[#E63946]/20">
-              <Trophy className="h-6 w-6 text-[#E63946]" />
+      {tab === "rewards" && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-2xl bg-white p-5 ring-1 ring-[#E5E7EB]">
+              <Trophy className="h-6 w-6 text-purple-600" />
               <p className="mt-2 text-2xl font-bold text-[#111111]">{volStats.skillRank}</p>
               <p className="text-xs text-[#525866]">Current rank</p>
             </div>
@@ -213,7 +195,7 @@ function VolunteerPortal() {
           </div>
           <SectionCard title="Achievement Badges">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {["First Response", "CPR Hero", "10 Lives", "Night Owl", "Speed Responder", "Community Leader"].map((badge, earned) => (
+              {["First Response", "CPR Hero", "10 Lives", "Night Owl", "Speed Responder", "Community Leader"].map((badge) => (
                 <div key={badge} className="rounded-xl bg-[#F8F9FB] p-4 text-center">
                   <div className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-success/10">
                     <CheckCircle2 className="h-5 w-5 text-success" />
@@ -260,15 +242,32 @@ function VolunteerPortal() {
         const profile = getProfile("volunteer");
         const name = getDisplayName("volunteer", user);
         const subtitle = `VOL-${user?.id?.substr(-4).toUpperCase() || "202"} · ${profile.skillRank || "Gold Responder"}`;
+        const skillsList = Array.isArray(profile.skills) ? profile.skills.join(", ") : (profile.skills || "CPR, First Aid, AED");
+        const responseTypesList = Array.isArray(profile.preferredResponseTypes)
+          ? profile.preferredResponseTypes.join(", ")
+          : profile.preferredResponseTypes;
 
         return (
           <div className="mx-auto max-w-lg space-y-4">
             <ProfileHeader name={name} subtitle={subtitle} role="volunteer" />
             {[
-              { label: "Certifications", value: profile.certificationType || "CPR, First Aid, AED" },
+              { label: "Full Name", value: name },
+              { label: "Active Skills", value: skillsList },
+              { label: "Preferred Response Types", value: responseTypesList || "Medical Emergency, Road Accident" },
+              { label: "Government / Volunteer ID", value: profile.idNumber || profile.idProofName || "Verified ID" },
+              {
+                label: "Emergency Contact",
+                value: profile.emergencyContactName
+                  ? `${profile.emergencyContactName} (${profile.relationship || "Contact"}) - +91 ${profile.emergencyContactNumber}`
+                  : "Registered Contact",
+              },
+              {
+                label: "Emergency Dispatch Availability",
+                value: profile.emergencyDispatchAvailable ? `Available (${profile.emergencyDispatchAvailable})` : "Yes",
+              },
               { label: "Community Score", value: `${volStats.communityScore} XP` },
-              { label: "Availability", value: profile.availabilitySchedule || "Weekends & Evenings" },
               { label: "Response Radius", value: profile.availabilityRadius || "2 km" },
+              { label: "Blood Group", value: profile.bloodGroup || "O+" },
             ].map((row) => (
               <div key={row.label} className="rounded-xl bg-white p-4 ring-1 ring-[#E5E7EB]">
                 <p className="text-[10px] font-bold uppercase text-[#525866]">{row.label}</p>

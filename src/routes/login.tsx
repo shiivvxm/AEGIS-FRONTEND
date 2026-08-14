@@ -21,13 +21,13 @@ export const Route = createFileRoute("/login")({
 });
 
 const emailLoginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
   role: z.string().min(1, "Please select your portal role"),
 });
 
 const phoneLoginSchema = z.object({
-  phone: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
+  phone: z.string().min(1, "Mobile number is required").regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
   code: z.string().min(1, "Verification code is required"),
   role: z.string().min(1, "Please select your portal role"),
 });
@@ -164,16 +164,17 @@ function LoginPortal() {
   const onEmailSubmit = async (data: EmailLoginData) => {
     setLoading(true);
     try {
-      const loggedUser = await login(data.email, data.password, data.role as Role);
+      const loggedUser = await login(data.role as Role, data.email, data.password);
       toast.success(`Welcome back, ${loggedUser.name}!`);
       
+      const roleLower = loggedUser.role ? String(loggedUser.role).trim().toLowerCase() : "";
       // Role-specific redirect
-      if (loggedUser.role === "citizen") navigate({ to: "/citizen" });
-      if (loggedUser.role === "hospital") navigate({ to: "/hospital" });
-      if (loggedUser.role === "ambulance") navigate({ to: "/ambulance" });
-      if (loggedUser.role === "volunteer") navigate({ to: "/volunteer" });
-      if (loggedUser.role === "traffic") navigate({ to: "/traffic" });
-      if (loggedUser.role === "admin") navigate({ to: "/command" });
+      if (roleLower === "citizen") navigate({ to: "/citizen" });
+      if (roleLower === "hospital") navigate({ to: "/hospital" });
+      if (roleLower === "ambulance") navigate({ to: "/ambulance" });
+      if (roleLower === "volunteer") navigate({ to: "/volunteer" });
+      if (roleLower === "traffic") navigate({ to: "/traffic" });
+      if (roleLower === "admin" || roleLower === "command") navigate({ to: "/command" });
     } catch (err: any) {
       toast.error(err.message || "Invalid credentials.");
     } finally {
@@ -185,16 +186,17 @@ function LoginPortal() {
     setLoading(true);
     try {
       // For mock phone authentication, log in using mobile number as the match
-      const loggedUser = await login(data.phone, data.code, data.role as Role);
+      const loggedUser = await login(data.role as Role, data.phone, data.code);
       toast.success(`Welcome back, ${loggedUser.name}!`);
       
+      const roleLower = loggedUser.role ? String(loggedUser.role).trim().toLowerCase() : "";
       // Role-specific redirect
-      if (loggedUser.role === "citizen") navigate({ to: "/citizen" });
-      if (loggedUser.role === "hospital") navigate({ to: "/hospital" });
-      if (loggedUser.role === "ambulance") navigate({ to: "/ambulance" });
-      if (loggedUser.role === "volunteer") navigate({ to: "/volunteer" });
-      if (loggedUser.role === "traffic") navigate({ to: "/traffic" });
-      if (loggedUser.role === "admin") navigate({ to: "/command" });
+      if (roleLower === "citizen") navigate({ to: "/citizen" });
+      if (roleLower === "hospital") navigate({ to: "/hospital" });
+      if (roleLower === "ambulance") navigate({ to: "/ambulance" });
+      if (roleLower === "volunteer") navigate({ to: "/volunteer" });
+      if (roleLower === "traffic") navigate({ to: "/traffic" });
+      if (roleLower === "admin" || roleLower === "command") navigate({ to: "/command" });
     } catch (err: any) {
       toast.error(err.message || "Invalid code or phone number.");
     } finally {

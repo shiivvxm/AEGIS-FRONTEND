@@ -90,7 +90,7 @@ function HospitalPortal() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || user?.role !== "hospital")) {
+    if (!isLoading && (!isAuthenticated || user?.role?.toLowerCase() !== "hospital")) {
       navigate({ to: "/login" });
     }
   }, [isAuthenticated, user, isLoading, navigate]);
@@ -153,7 +153,7 @@ function HospitalPortal() {
 
   const [commTarget, setCommTarget] = useState<string | null>(null);
 
-  if (isLoading || !isAuthenticated || user?.role !== "hospital") {
+  if (isLoading || !isAuthenticated || user?.role?.toLowerCase() !== "hospital") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="h-6 w-6 animate-ping bg-blue-600 rounded-full" />

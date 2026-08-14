@@ -7,6 +7,7 @@ import { Building2, ArrowLeft, ArrowRight, Activity, CheckCircle2 } from "lucide
 import { PasswordInput } from "@/components/ui/password-input";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useAuth } from "@/hooks/use-auth";
+import { saveProfile } from "@/lib/profile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/register/hospital")({
@@ -90,10 +91,12 @@ function HospitalRegister() {
   const onSubmit = async (data: HospitalFormData) => {
     setLoading(true);
     try {
-      await registerUser("hospital", {
+      const payload = {
         ...data,
         accreditationUpload: data.accreditationUpload?.name || "mock_accreditation.pdf",
-      });
+      };
+      await registerUser("hospital", payload);
+      saveProfile("hospital", payload);
       setSuccess(true);
       toast.success("Hospital Portal Registered!");
       setTimeout(() => {

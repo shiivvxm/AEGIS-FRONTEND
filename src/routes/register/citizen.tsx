@@ -6,6 +6,7 @@ import * as z from "zod";
 import { HeartPulse, ArrowLeft, ArrowRight, Activity, CheckCircle2 } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/hooks/use-auth";
+import { saveProfile } from "@/lib/profile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/register/citizen")({
@@ -91,6 +92,7 @@ function CitizenRegister() {
     setLoading(true);
     try {
       await registerUser("citizen", data);
+      saveProfile("citizen", data);
       setSuccess(true);
       toast.success("Citizen Registration Complete!");
       setTimeout(() => {

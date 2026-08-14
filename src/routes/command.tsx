@@ -469,7 +469,7 @@ function AdminPortal() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || user?.role !== "admin")) {
+    if (!isLoading && (!isAuthenticated || (user?.role !== "admin" && user?.role !== "command"))) {
       navigate({ to: "/login" });
     }
   }, [isAuthenticated, user, isLoading, navigate]);
@@ -638,7 +638,7 @@ function AdminPortal() {
 
   const activeCount = ALL_INCIDENTS.filter((e) => e.status !== "resolved").length;
 
-  if (isLoading || !isAuthenticated || user?.role !== "admin") {
+  if (isLoading || !isAuthenticated || (user?.role !== "admin" && user?.role !== "command")) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#080C14]">
         <div className="h-6 w-6 animate-ping bg-[#E63946] rounded-full" />
