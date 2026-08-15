@@ -93,11 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = async (
-    arg1: Role | string,
-    arg2: string,
-    arg3?: Role | string
-  ): Promise<User> => {
+  const login = async (arg1: Role | string, arg2: string, arg3?: Role | string): Promise<User> => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 400));
 
@@ -105,7 +101,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let identifier: string;
     let password: string | undefined;
 
-    const validRoles = ["citizen", "volunteer", "ambulance", "hospital", "traffic", "command", "admin"];
+    const validRoles = [
+      "citizen",
+      "volunteer",
+      "ambulance",
+      "hospital",
+      "traffic",
+      "command",
+      "admin",
+    ];
 
     if (typeof arg1 === "string" && validRoles.includes(arg1)) {
       role = arg1 as Role;
@@ -130,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const matchedUserByIdentifier = mockUsers.find(
       (u) =>
         (u.email && u.email.trim().toLowerCase() === cleanIdentifier) ||
-        (u.mobileNumber && u.mobileNumber.trim() === cleanIdentifier)
+        (u.mobileNumber && u.mobileNumber.trim() === cleanIdentifier),
     );
 
     if (!matchedUserByIdentifier) {
@@ -138,7 +142,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error("Account not found. Please create an account first.");
     }
 
-    const userRoleLower = matchedUserByIdentifier.role ? String(matchedUserByIdentifier.role).trim().toLowerCase() : "";
+    const userRoleLower = matchedUserByIdentifier.role
+      ? String(matchedUserByIdentifier.role).trim().toLowerCase()
+      : "";
     const targetRoleLower = role ? String(role).trim().toLowerCase() : "";
 
     const isRoleMatch =
@@ -151,12 +157,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error("Selected portal role does not match this account.");
     }
 
-    if (matchedUserByIdentifier.password && password && matchedUserByIdentifier.password !== password) {
+    if (
+      matchedUserByIdentifier.password &&
+      password &&
+      matchedUserByIdentifier.password !== password
+    ) {
       setIsLoading(false);
       throw new Error("Invalid email or password.");
     }
 
-    const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." + btoa(JSON.stringify(matchedUserByIdentifier));
+    const mockToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." + btoa(JSON.stringify(matchedUserByIdentifier));
 
     localStorage.setItem("aegis_user", JSON.stringify(matchedUserByIdentifier));
     localStorage.setItem("aegis_token", mockToken);
@@ -182,9 +193,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const existingIndex = mockUsers.findIndex(
       (u) =>
         (u.role?.toLowerCase() === targetRoleLower ||
-          ((u.role === "command" || u.role === "admin") && (targetRoleLower === "command" || targetRoleLower === "admin"))) &&
+          ((u.role === "command" || u.role === "admin") &&
+            (targetRoleLower === "command" || targetRoleLower === "admin"))) &&
         ((cleanEmail && u.email?.toLowerCase() === cleanEmail) ||
-          (cleanMobile && u.mobileNumber === cleanMobile))
+          (cleanMobile && u.mobileNumber === cleanMobile)),
     );
 
     let newUser: User;
@@ -193,7 +205,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newUser = {
         ...mockUsers[existingIndex],
         email: userData.email || mockUsers[existingIndex].email,
-        name: userData.fullName || userData.operatorName || userData.hospitalName || userData.officerName || userData.driverName || mockUsers[existingIndex].name,
+        name:
+          userData.fullName ||
+          userData.operatorName ||
+          userData.hospitalName ||
+          userData.officerName ||
+          userData.driverName ||
+          mockUsers[existingIndex].name,
         mobileNumber: userData.mobileNumber || mockUsers[existingIndex].mobileNumber,
         role: role,
       };
@@ -202,7 +220,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newUser = {
         id: `usr-${Math.random().toString(36).substr(2, 9)}`,
         email: userData.email,
-        name: userData.fullName || userData.operatorName || userData.hospitalName || userData.officerName || userData.driverName || "AEGIS User",
+        name:
+          userData.fullName ||
+          userData.operatorName ||
+          userData.hospitalName ||
+          userData.officerName ||
+          userData.driverName ||
+          "AEGIS User",
         role: role,
         mobileNumber: userData.mobileNumber,
         isVerified: false,

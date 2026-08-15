@@ -54,8 +54,30 @@ export interface Volunteer {
 
 const TYPES: EmergencyType[] = ["Accident", "Cardiac", "Trauma", "Stroke", "Fire", "Maternal"];
 const SEVERITIES: Severity[] = ["critical", "high", "medium", "low"];
-const ZONES = ["Sector 9", "Raj Nagar", "Indirapuram", "Vasundhara", "Vaishali", "Kavi Nagar", "Crossings", "Govindpuram"];
-const FIRST = ["Aarav", "Vivaan", "Ananya", "Diya", "Arjun", "Ishaan", "Rohan", "Kavya", "Riya", "Aditya", "Meera", "Karan"];
+const ZONES = [
+  "Sector 9",
+  "Raj Nagar",
+  "Indirapuram",
+  "Vasundhara",
+  "Vaishali",
+  "Kavi Nagar",
+  "Crossings",
+  "Govindpuram",
+];
+const FIRST = [
+  "Aarav",
+  "Vivaan",
+  "Ananya",
+  "Diya",
+  "Arjun",
+  "Ishaan",
+  "Rohan",
+  "Kavya",
+  "Riya",
+  "Aditya",
+  "Meera",
+  "Karan",
+];
 const LAST = ["Sharma", "Verma", "Gupta", "Singh", "Khan", "Patel", "Nair", "Reddy", "Iyer", "Das"];
 
 const seedRand = (seed: number) => {
@@ -66,7 +88,7 @@ const seedRand = (seed: number) => {
   };
 };
 
-const pick = <T,>(arr: T[], r: () => number) => arr[Math.floor(r() * arr.length)];
+const pick = <T>(arr: T[], r: () => number) => arr[Math.floor(r() * arr.length)];
 
 // Center: Ghaziabad / NCR area
 const CENTER = { lat: 28.6692, lng: 77.4538 };
@@ -75,7 +97,8 @@ export function generateEmergencies(n = 12): Emergency[] {
   const r = seedRand(42);
   return Array.from({ length: n }, (_, i) => {
     const sev = pick(SEVERITIES, r);
-    const status: Emergency["status"] = i < 3 ? "active" : i < 6 ? "dispatched" : i < 9 ? "en-route" : "at-hospital";
+    const status: Emergency["status"] =
+      i < 3 ? "active" : i < 6 ? "dispatched" : i < 9 ? "en-route" : "at-hospital";
     return {
       id: `EMG-${1000 + i}`,
       type: pick(TYPES, r),
@@ -109,7 +132,16 @@ export function generateAmbulances(n = 16): Ambulance[] {
 
 export function generateHospitals(n = 8): Hospital[] {
   const r = seedRand(99);
-  const NAMES = ["Apollo", "Fortis", "Max", "Yashoda", "Columbia Asia", "Sarvodaya", "Atlanta", "Vasundhara Medical"];
+  const NAMES = [
+    "Apollo",
+    "Fortis",
+    "Max",
+    "Yashoda",
+    "Columbia Asia",
+    "Sarvodaya",
+    "Atlanta",
+    "Vasundhara Medical",
+  ];
   return Array.from({ length: n }, (_, i) => ({
     id: `HSP-${10 + i}`,
     name: `${NAMES[i % NAMES.length]} Hospital`,
@@ -139,7 +171,7 @@ export function generateVolunteers(n = 6): Volunteer[] {
 }
 
 export const responseTimeData = Array.from({ length: 12 }, (_, i) => ({
-  month: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][i],
+  month: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i],
   before: 18 - Math.random() * 2,
   after: 7 - Math.random() * 1.5,
 }));
@@ -159,7 +191,7 @@ export const utilizationData = Array.from({ length: 24 }, (_, h) => ({
 }));
 
 export const livesSavedData = Array.from({ length: 7 }, (_, i) => ({
-  day: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][i],
+  day: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i],
   lives: Math.round(40 + Math.random() * 30),
   incidents: Math.round(80 + Math.random() * 50),
 }));
@@ -251,9 +283,7 @@ export const cctvCameras: CCTVCamera[] = [
     location: "GT Road Junction",
     zone: "Govindpuram",
     status: "live",
-    detections: [
-      { type: "vehicle", confidence: 91, timestamp: "16:19:44" },
-    ],
+    detections: [{ type: "vehicle", confidence: 91, timestamp: "16:19:44" }],
   },
 ];
 
@@ -278,8 +308,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(1)
         ? "Severity classified · Victims estimated: 4–6"
         : isProcessing(1)
-        ? "Classifying incident severity..."
-        : "Awaiting incident trigger",
+          ? "Classifying incident severity..."
+          : "Awaiting incident trigger",
     },
     {
       id: "vision-agent",
@@ -288,8 +318,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(1)
         ? "CCTV analyzed · Accident + 4 persons detected (94%)"
         : isProcessing(1)
-        ? "Processing CCTV feed CAM-001..."
-        : "Monitoring camera network",
+          ? "Processing CCTV feed CAM-001..."
+          : "Monitoring camera network",
     },
     {
       id: "ambulance-agent",
@@ -298,8 +328,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(2)
         ? "AMB-100 selected · 96% match · ETA 4 min"
         : isProcessing(2)
-        ? "Selecting optimal ambulance..."
-        : "Awaiting incident classification",
+          ? "Selecting optimal ambulance..."
+          : "Awaiting incident classification",
     },
     {
       id: "hospital-agent",
@@ -308,8 +338,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(2)
         ? "Apollo Hospital matched · ICU: 8 free · 3.2 km"
         : isProcessing(2)
-        ? "Matching hospital capacity..."
-        : "Awaiting incident classification",
+          ? "Matching hospital capacity..."
+          : "Awaiting incident classification",
     },
     {
       id: "traffic-agent",
@@ -318,8 +348,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(3)
         ? "Green corridor active · 6 signals overridden"
         : isProcessing(3)
-        ? "Creating emergency corridor..."
-        : "Awaiting dispatch confirmation",
+          ? "Creating emergency corridor..."
+          : "Awaiting dispatch confirmation",
     },
     {
       id: "volunteer-agent",
@@ -328,8 +358,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(2)
         ? "2 volunteers notified · Nearest ETA 3 min"
         : isProcessing(2)
-        ? "Locating certified nearby responders..."
-        : "Awaiting incident classification",
+          ? "Locating certified nearby responders..."
+          : "Awaiting incident classification",
     },
     {
       id: "command-agent",
@@ -338,8 +368,8 @@ export function getAgentStates(incidentStatus: Emergency["status"]): AegisAgent[
       currentTask: isDone(3)
         ? "Response plan ready · Awaiting operator approval"
         : isProcessing(3)
-        ? "Generating unified response plan..."
-        : "Coordinating all agents",
+          ? "Generating unified response plan..."
+          : "Coordinating all agents",
     },
   ];
 }
@@ -415,20 +445,89 @@ export const initialTrafficCorridors: TrafficCorridor[] = [
 ];
 
 export const initialTrafficSignals: TrafficSignal[] = [
-  { id: "SIG-621", intersection: "Sector 62 Main Junction", zone: "Sector 62", status: "green-override", overrideBy: "AMB-1083 Green Corridor", timeRemainingSec: 140 },
-  { id: "SIG-622", intersection: "NH-24 Bypass Slip Road", zone: "Sector 62", status: "green-override", overrideBy: "AMB-1083 Green Corridor", timeRemainingSec: 180 },
-  { id: "SIG-301", intersection: "Raj Nagar Flyover Entry", zone: "Raj Nagar", status: "normal-auto", timeRemainingSec: 45 },
-  { id: "SIG-404", intersection: "Indirapuram Metro Gate 2", zone: "Indirapuram", status: "congested", timeRemainingSec: 25 },
-  { id: "SIG-508", intersection: "GT Road Central Junction", zone: "Govindpuram", status: "normal-auto", timeRemainingSec: 60 },
-  { id: "SIG-712", intersection: "Vasundhara Sector 4 Crossing", zone: "Vasundhara", status: "green-override", overrideBy: "AMB-1094 Emergency", timeRemainingSec: 95 },
+  {
+    id: "SIG-621",
+    intersection: "Sector 62 Main Junction",
+    zone: "Sector 62",
+    status: "green-override",
+    overrideBy: "AMB-1083 Green Corridor",
+    timeRemainingSec: 140,
+  },
+  {
+    id: "SIG-622",
+    intersection: "NH-24 Bypass Slip Road",
+    zone: "Sector 62",
+    status: "green-override",
+    overrideBy: "AMB-1083 Green Corridor",
+    timeRemainingSec: 180,
+  },
+  {
+    id: "SIG-301",
+    intersection: "Raj Nagar Flyover Entry",
+    zone: "Raj Nagar",
+    status: "normal-auto",
+    timeRemainingSec: 45,
+  },
+  {
+    id: "SIG-404",
+    intersection: "Indirapuram Metro Gate 2",
+    zone: "Indirapuram",
+    status: "congested",
+    timeRemainingSec: 25,
+  },
+  {
+    id: "SIG-508",
+    intersection: "GT Road Central Junction",
+    zone: "Govindpuram",
+    status: "normal-auto",
+    timeRemainingSec: 60,
+  },
+  {
+    id: "SIG-712",
+    intersection: "Vasundhara Sector 4 Crossing",
+    zone: "Vasundhara",
+    status: "green-override",
+    overrideBy: "AMB-1094 Emergency",
+    timeRemainingSec: 95,
+  },
 ];
 
 export const initialCongestionZones: TrafficCongestionZone[] = [
-  { id: "Z-01", zoneName: "NH-24 Bridge Flyover", congestionLevel: "critical", avgSpeedKmH: 14, activeIncidents: 2 },
-  { id: "Z-02", zoneName: "Raj Nagar Central Junction", congestionLevel: "heavy", avgSpeedKmH: 22, activeIncidents: 1 },
-  { id: "Z-03", zoneName: "Sector 62 Metro Corridor", congestionLevel: "clear", avgSpeedKmH: 52, activeIncidents: 1 },
-  { id: "Z-04", zoneName: "GT Road Industrial Crossing", congestionLevel: "moderate", avgSpeedKmH: 34, activeIncidents: 0 },
-  { id: "Z-05", zoneName: "Vasundhara Link Road", congestionLevel: "clear", avgSpeedKmH: 48, activeIncidents: 0 },
+  {
+    id: "Z-01",
+    zoneName: "NH-24 Bridge Flyover",
+    congestionLevel: "critical",
+    avgSpeedKmH: 14,
+    activeIncidents: 2,
+  },
+  {
+    id: "Z-02",
+    zoneName: "Raj Nagar Central Junction",
+    congestionLevel: "heavy",
+    avgSpeedKmH: 22,
+    activeIncidents: 1,
+  },
+  {
+    id: "Z-03",
+    zoneName: "Sector 62 Metro Corridor",
+    congestionLevel: "clear",
+    avgSpeedKmH: 52,
+    activeIncidents: 1,
+  },
+  {
+    id: "Z-04",
+    zoneName: "GT Road Industrial Crossing",
+    congestionLevel: "moderate",
+    avgSpeedKmH: 34,
+    activeIncidents: 0,
+  },
+  {
+    id: "Z-05",
+    zoneName: "Vasundhara Link Road",
+    congestionLevel: "clear",
+    avgSpeedKmH: 48,
+    activeIncidents: 0,
+  },
 ];
 
 export const initialRoadBlockages: RoadBlockage[] = [
@@ -453,4 +552,3 @@ export const initialRoadBlockages: RoadBlockage[] = [
     reroutePlan: "Use Service Road 3 for northbound traffic",
   },
 ];
-

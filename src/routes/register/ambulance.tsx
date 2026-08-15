@@ -38,10 +38,16 @@ const ambulanceSchema = z
     serviceArea: z.string().min(2, "Operating Service Area is required"),
     vehicleRegUpload: z
       .any()
-      .refine((val) => val !== null && val !== undefined && val !== "", "Vehicle registration document is required"),
+      .refine(
+        (val) => val !== null && val !== undefined && val !== "",
+        "Vehicle registration document is required",
+      ),
     driverLicenseUpload: z
       .any()
-      .refine((val) => val !== null && val !== undefined && val !== "", "Driver license document is required"),
+      .refine(
+        (val) => val !== null && val !== undefined && val !== "",
+        "Driver license document is required",
+      ),
     consent: z
       .boolean()
       .refine((val) => val === true, "You must consent to sharing GPS tracking telemetry"),
@@ -132,9 +138,7 @@ function AmbulanceFileUpload({
           <p className="text-xs font-bold text-gray-700">
             Click to <span className="text-amber-600 underline">Upload Document</span>
           </p>
-          <p className="text-[10px] text-gray-400 mt-0.5 font-medium">
-            PDF, PNG, JPG (max 5MB)
-          </p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-medium">PDF, PNG, JPG (max 5MB)</p>
         </button>
       )}
     </div>
@@ -209,15 +213,15 @@ function AmbulanceRegister() {
         data.vehicleRegUpload instanceof File
           ? data.vehicleRegUpload.name
           : typeof data.vehicleRegUpload === "string"
-          ? data.vehicleRegUpload
-          : "mock_reg.pdf";
+            ? data.vehicleRegUpload
+            : "mock_reg.pdf";
 
       const driverLicenseName =
         data.driverLicenseUpload instanceof File
           ? data.driverLicenseUpload.name
           : typeof data.driverLicenseUpload === "string"
-          ? data.driverLicenseUpload
-          : "mock_dl.pdf";
+            ? data.driverLicenseUpload
+            : "mock_dl.pdf";
 
       const payload = {
         operatorName: data.operatorName,
@@ -298,7 +302,10 @@ function AmbulanceRegister() {
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-600 animate-pulse rounded-full" style={{ width: "90%" }} />
+                  <div
+                    className="h-full bg-amber-600 animate-pulse rounded-full"
+                    style={{ width: "90%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -336,7 +343,9 @@ function AmbulanceRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:ring-2 focus:ring-amber-600/10 focus:outline-none transition-all"
                     />
                     {errors.operatorName?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.operatorName.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.operatorName.message)}
+                      </p>
                     )}
                   </div>
 
@@ -351,7 +360,9 @@ function AmbulanceRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:ring-2 focus:ring-amber-600/10 focus:outline-none transition-all"
                     />
                     {errors.email?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.email.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.email.message)}
+                      </p>
                     )}
                   </div>
 
@@ -372,7 +383,9 @@ function AmbulanceRegister() {
                       />
                     </div>
                     {errors.mobileNumber?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.mobileNumber.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.mobileNumber.message)}
+                      </p>
                     )}
                   </div>
 
@@ -381,9 +394,15 @@ function AmbulanceRegister() {
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         Password
                       </label>
-                      <PasswordInput showStrength {...register("password")} placeholder="••••••••" />
+                      <PasswordInput
+                        showStrength
+                        {...register("password")}
+                        placeholder="••••••••"
+                      />
                       {errors.password?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.password.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.password.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -392,7 +411,9 @@ function AmbulanceRegister() {
                       </label>
                       <PasswordInput {...register("confirmPassword")} placeholder="••••••••" />
                       {errors.confirmPassword?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.confirmPassword.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.confirmPassword.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -414,7 +435,9 @@ function AmbulanceRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                       />
                       {errors.organizationName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.organizationName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.organizationName.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -428,7 +451,9 @@ function AmbulanceRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                       />
                       {errors.ambulanceNumber?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.ambulanceNumber.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.ambulanceNumber.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -444,11 +469,15 @@ function AmbulanceRegister() {
                       >
                         <option value="">Select Level</option>
                         <option value="Basic Life Support (BLS)">Basic Life Support (BLS)</option>
-                        <option value="Advanced Life Support (ALS)">Advanced Life Support (ALS)</option>
+                        <option value="Advanced Life Support (ALS)">
+                          Advanced Life Support (ALS)
+                        </option>
                         <option value="ICU Ambulance">ICU Ambulance</option>
                       </select>
                       {errors.vehicleType?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.vehicleType.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.vehicleType.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -462,7 +491,9 @@ function AmbulanceRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                       />
                       {errors.gpsDeviceId?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.gpsDeviceId.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.gpsDeviceId.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -479,7 +510,9 @@ function AmbulanceRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                       />
                       {errors.driverName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.driverName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.driverName.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -493,7 +526,9 @@ function AmbulanceRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                       />
                       {errors.driverLicenseNumber?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.driverLicenseNumber.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.driverLicenseNumber.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -509,7 +544,9 @@ function AmbulanceRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
                     />
                     {errors.serviceArea?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.serviceArea.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.serviceArea.message)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -544,10 +581,14 @@ function AmbulanceRegister() {
                     />
                   </div>
                   {errors.vehicleRegUpload?.message && (
-                    <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.vehicleRegUpload.message)}</p>
+                    <p className="text-[10px] text-red-500 font-bold">
+                      ⚠️ {String(errors.vehicleRegUpload.message)}
+                    </p>
                   )}
                   {errors.driverLicenseUpload?.message && (
-                    <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.driverLicenseUpload.message)}</p>
+                    <p className="text-[10px] text-red-500 font-bold">
+                      ⚠️ {String(errors.driverLicenseUpload.message)}
+                    </p>
                   )}
 
                   <div className="pt-2">
@@ -558,12 +599,15 @@ function AmbulanceRegister() {
                         className="rounded mt-1 text-amber-600 focus:ring-amber-600 h-4 w-4"
                       />
                       <span className="text-[10px] leading-relaxed text-gray-500 font-semibold uppercase tracking-wide">
-                        I hereby authorize AEGIS Metro Command to capture and stream live GPS positioning coordinate
-                        logs from my paired onboard tracker during mission active dispatch cycles.
+                        I hereby authorize AEGIS Metro Command to capture and stream live GPS
+                        positioning coordinate logs from my paired onboard tracker during mission
+                        active dispatch cycles.
                       </span>
                     </label>
                     {errors.consent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.consent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.consent.message)}
+                      </p>
                     )}
                   </div>
                 </div>

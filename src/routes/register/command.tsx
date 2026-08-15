@@ -26,8 +26,12 @@ const commandSchema = z
       .string()
       .email("Invalid email address")
       .refine(
-        (val) => val.endsWith(".gov.in") || val.endsWith(".nic.in") || val.includes("admin") || val.includes("@"),
-        { message: "Requires an official government email address (.gov.in or .nic.in)" }
+        (val) =>
+          val.endsWith(".gov.in") ||
+          val.endsWith(".nic.in") ||
+          val.includes("admin") ||
+          val.includes("@"),
+        { message: "Requires an official government email address (.gov.in or .nic.in)" },
       ),
     mobileNumber: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
     password: z
@@ -49,14 +53,23 @@ const commandSchema = z
     badgeId: z.string().min(2, "Operations Badge / Officer ID is required"),
     idProof: z
       .any()
-      .refine((val) => val !== null && val !== undefined && val !== "", "Official ID Proof document is required"),
+      .refine(
+        (val) => val !== null && val !== undefined && val !== "",
+        "Official ID Proof document is required",
+      ),
     controlCentre: z.string().min(1, "Please select Control Centre"),
     dutyShift: z.string().min(1, "Please select Duty Shift"),
     emergencyContactName: z.string().min(2, "Emergency Contact Name is required"),
-    emergencyContactNumber: z.string().regex(/^[0-9]{10}$/, "Emergency contact number must be 10 digits"),
-    authorizedConsent: z.boolean().refine((val) => val === true, "You must confirm access authorization"),
+    emergencyContactNumber: z
+      .string()
+      .regex(/^[0-9]{10}$/, "Emergency contact number must be 10 digits"),
+    authorizedConsent: z
+      .boolean()
+      .refine((val) => val === true, "You must confirm access authorization"),
     infoConsent: z.boolean().refine((val) => val === true, "You must confirm information accuracy"),
-    policyConsent: z.boolean().refine((val) => val === true, "You must agree to AEGIS Operations security policies"),
+    policyConsent: z
+      .boolean()
+      .refine((val) => val === true, "You must agree to AEGIS Operations security policies"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -116,7 +129,14 @@ function CommandRegister() {
   const nextStep = async () => {
     let fieldsToValidate: (keyof CommandFormData)[] = [];
     if (step === 1) {
-      fieldsToValidate = ["officerName", "employeeId", "email", "mobileNumber", "password", "confirmPassword"];
+      fieldsToValidate = [
+        "officerName",
+        "employeeId",
+        "email",
+        "mobileNumber",
+        "password",
+        "confirmPassword",
+      ];
     } else if (step === 2) {
       fieldsToValidate = ["departmentName", "designation", "regionZone", "clearanceLevel"];
     }
@@ -138,8 +158,8 @@ function CommandRegister() {
         data.idProof && typeof data.idProof === "object" && "name" in data.idProof
           ? data.idProof.name
           : typeof data.idProof === "string"
-          ? data.idProof
-          : "Operations_Badge_ID.pdf";
+            ? data.idProof
+            : "Operations_Badge_ID.pdf";
 
       const payload = {
         officerName: data.officerName,
@@ -226,7 +246,10 @@ function CommandRegister() {
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-slate-800 animate-pulse rounded-full" style={{ width: "90%" }} />
+                  <div
+                    className="h-full bg-slate-800 animate-pulse rounded-full"
+                    style={{ width: "90%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -265,7 +288,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
                       {errors.officerName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.officerName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.officerName.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -279,7 +304,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none transition-all"
                       />
                       {errors.employeeId?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.employeeId.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.employeeId.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -295,7 +322,9 @@ function CommandRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                     />
                     {errors.email?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.email.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.email.message)}
+                      </p>
                     )}
                   </div>
 
@@ -316,7 +345,9 @@ function CommandRegister() {
                       />
                     </div>
                     {errors.mobileNumber?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.mobileNumber.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.mobileNumber.message)}
+                      </p>
                     )}
                   </div>
 
@@ -325,9 +356,15 @@ function CommandRegister() {
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         Password
                       </label>
-                      <PasswordInput showStrength {...register("password")} placeholder="••••••••" />
+                      <PasswordInput
+                        showStrength
+                        {...register("password")}
+                        placeholder="••••••••"
+                      />
                       {errors.password?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.password.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.password.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -336,7 +373,9 @@ function CommandRegister() {
                       </label>
                       <PasswordInput {...register("confirmPassword")} placeholder="••••••••" />
                       {errors.confirmPassword?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.confirmPassword.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.confirmPassword.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -358,7 +397,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none"
                       />
                       {errors.departmentName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.departmentName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.departmentName.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -372,7 +413,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none"
                       />
                       {errors.designation?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.designation.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.designation.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -387,12 +430,16 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
                       >
                         <option value="">Select Region</option>
-                        <option value="Delhi NCR Metropolitan Region">Delhi NCR Metropolitan Region</option>
+                        <option value="Delhi NCR Metropolitan Region">
+                          Delhi NCR Metropolitan Region
+                        </option>
                         <option value="Mumbai Smart Grid Area">Mumbai Smart Grid Area</option>
                         <option value="Bengaluru Operations Grid">Bengaluru Operations Grid</option>
                       </select>
                       {errors.regionZone?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.regionZone.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.regionZone.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -404,12 +451,20 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all bg-white"
                       >
                         <option value="">Select Level</option>
-                        <option value="Level 1 - General dispatch">Level 1 - General dispatch</option>
-                        <option value="Level 2 - Fleet Allocations">Level 2 - Fleet Allocations</option>
-                        <option value="Level 3 - Metropolitan Override">Level 3 - Metropolitan Override</option>
+                        <option value="Level 1 - General dispatch">
+                          Level 1 - General dispatch
+                        </option>
+                        <option value="Level 2 - Fleet Allocations">
+                          Level 2 - Fleet Allocations
+                        </option>
+                        <option value="Level 3 - Metropolitan Override">
+                          Level 3 - Metropolitan Override
+                        </option>
                       </select>
                       {errors.clearanceLevel?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.clearanceLevel.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.clearanceLevel.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -435,7 +490,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
                       {errors.badgeId?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.badgeId.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.badgeId.message)}
+                        </p>
                       )}
                     </div>
 
@@ -454,7 +511,9 @@ function CommandRegister() {
                         )}
                       />
                       {errors.idProof?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.idProof.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.idProof.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -481,7 +540,9 @@ function CommandRegister() {
                           ))}
                         </select>
                         {errors.controlCentre?.message && (
-                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.controlCentre.message)}</p>
+                          <p className="text-[10px] text-red-500 font-bold mt-1">
+                            ⚠️ {String(errors.controlCentre.message)}
+                          </p>
                         )}
                       </div>
 
@@ -501,7 +562,9 @@ function CommandRegister() {
                           ))}
                         </select>
                         {errors.dutyShift?.message && (
-                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.dutyShift.message)}</p>
+                          <p className="text-[10px] text-red-500 font-bold mt-1">
+                            ⚠️ {String(errors.dutyShift.message)}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -523,7 +586,9 @@ function CommandRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-slate-700 focus:ring-2 focus:ring-slate-700/10 focus:outline-none transition-all"
                       />
                       {errors.emergencyContactName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.emergencyContactName.message)}
+                        </p>
                       )}
                     </div>
 
@@ -544,7 +609,9 @@ function CommandRegister() {
                         />
                       </div>
                       {errors.emergencyContactNumber?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactNumber.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.emergencyContactNumber.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -565,7 +632,9 @@ function CommandRegister() {
                       </span>
                     </label>
                     {errors.authorizedConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.authorizedConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.authorizedConsent.message)}
+                      </p>
                     )}
 
                     <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
@@ -579,7 +648,9 @@ function CommandRegister() {
                       </span>
                     </label>
                     {errors.infoConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.infoConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.infoConsent.message)}
+                      </p>
                     )}
 
                     <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
@@ -593,7 +664,9 @@ function CommandRegister() {
                       </span>
                     </label>
                     {errors.policyConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.policyConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.policyConsent.message)}
+                      </p>
                     )}
                   </div>
                 </div>

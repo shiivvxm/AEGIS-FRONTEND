@@ -50,7 +50,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
-        
+
         {/* Development & Runtime Diagnostics Box */}
         <div className="text-left bg-red-50 border border-red-200 rounded-xl p-4 space-y-2 max-h-60 overflow-auto font-mono text-xs">
           <p className="font-bold text-red-700">Error: {error?.message || String(error)}</p>
@@ -89,15 +89,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "AEGIS – Emergency Response System" },
-      { name: "description", content: "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives." },
+      {
+        name: "description",
+        content:
+          "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives.",
+      },
       { name: "author", content: "AEGIS" },
       { property: "og:title", content: "AEGIS – Emergency Response System" },
-      { property: "og:description", content: "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives." },
+      {
+        property: "og:description",
+        content:
+          "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@AEGIS" },
       { name: "twitter:title", content: "AEGIS – Emergency Response System" },
-      { name: "twitter:description", content: "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives." },
+      {
+        name: "twitter:description",
+        content:
+          "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives.",
+      },
     ],
     links: [
       {

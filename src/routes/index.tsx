@@ -2,10 +2,26 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { 
-  Activity, Ambulance, ArrowRight, Brain, Building2, CheckCircle2, 
-  HeartPulse, MapPin, Radio, Shield, Siren, Sparkles, Timer, Users, 
-  Zap, AlertTriangle, ChevronRight, Play, Eye
+import {
+  Activity,
+  Ambulance,
+  ArrowRight,
+  Brain,
+  Building2,
+  CheckCircle2,
+  HeartPulse,
+  MapPin,
+  Radio,
+  Shield,
+  Siren,
+  Sparkles,
+  Timer,
+  Users,
+  Zap,
+  AlertTriangle,
+  ChevronRight,
+  Play,
+  Eye,
 } from "lucide-react";
 import { platformStats } from "@/lib/mock-data";
 
@@ -13,9 +29,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "AEGIS — AEGIS Emergency Response System" },
-      { name: "description", content: "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives." },
+      {
+        name: "description",
+        content:
+          "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives.",
+      },
       { property: "og:title", content: "AEGIS — AEGIS Emergency Response System" },
-      { property: "og:description", content: "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives." },
+      {
+        property: "og:description",
+        content:
+          "AEGIS Emergency Response System connects citizens, ambulances, hospitals, and volunteers in one intelligent emergency response network to reduce response times and save lives.",
+      },
     ],
   }),
   component: Landing,
@@ -59,24 +83,62 @@ function Landing() {
             </div>
             <div className="leading-tight">
               <div className="font-bold text-lg tracking-tight text-[#111111]">AEGIS</div>
-              <div className="text-[9px] uppercase tracking-wider text-[#E63946] font-extrabold">Protect. Respond. Save Lives.</div>
+              <div className="text-[9px] uppercase tracking-wider text-[#E63946] font-extrabold">
+                Protect. Respond. Save Lives.
+              </div>
             </div>
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            <a href="#solutions" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">Solutions</a>
-            <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">How It Works</a>
-            <a href="#for-hospitals" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">For Hospitals</a>
-            <a href="#for-ambulances" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">For Ambulance Services</a>
-            <a href="#resources" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">Resources</a>
-            <a href="#contact" className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors">Contact</a>
+            <a
+              href="#solutions"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              Solutions
+            </a>
+            <a
+              href="#how-it-works"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              How It Works
+            </a>
+            <a
+              href="#for-hospitals"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              For Hospitals
+            </a>
+            <a
+              href="#for-ambulances"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              For Ambulance Services
+            </a>
+            <a
+              href="#resources"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              Resources
+            </a>
+            <a
+              href="#contact"
+              className="text-sm font-medium text-gray-600 hover:text-[#111111] transition-colors"
+            >
+              Contact
+            </a>
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link to="/login" className="text-sm font-semibold text-gray-700 hover:text-[#111111] px-3 py-2 transition-colors">
+            <Link
+              to="/login"
+              className="text-sm font-semibold text-gray-700 hover:text-[#111111] px-3 py-2 transition-colors"
+            >
               Login
             </Link>
-            <Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-[#E63946] px-4 py-2 text-sm font-semibold text-white hover:bg-[#C32F3A] transition-all shadow-sm hover:shadow active:scale-95">
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center rounded-lg bg-[#E63946] px-4 py-2 text-sm font-semibold text-white hover:bg-[#C32F3A] transition-all shadow-sm hover:shadow active:scale-95"
+            >
               Get Started
             </Link>
           </div>
@@ -96,10 +158,14 @@ function Landing() {
               <span className="text-[#E63946]">Reimagined With AI.</span>
             </h1>
             <p className="max-w-xl text-lg text-gray-600 leading-relaxed">
-              AEGIS connects ambulances, hospitals, emergency responders and citizens in one intelligent network. Reduce response times. Improve coordination. Save lives.
+              AEGIS connects ambulances, hospitals, emergency responders and citizens in one
+              intelligent network. Reduce response times. Improve coordination. Save lives.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
-              <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#E63946] px-6 py-3.5 font-bold text-white hover:bg-[#C32F3A] transition-all shadow-lg shadow-[#E63946]/10 hover:shadow-xl hover:translate-y-[-1px] active:scale-95">
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#E63946] px-6 py-3.5 font-bold text-white hover:bg-[#C32F3A] transition-all shadow-lg shadow-[#E63946]/10 hover:shadow-xl hover:translate-y-[-1px] active:scale-95"
+              >
                 Launch Platform <ChevronRight className="h-4 w-4" />
               </Link>
               <button
@@ -117,7 +183,7 @@ function Landing() {
                 )}
               </button>
             </div>
-            
+
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-3 gap-4 border-t border-gray-100 pt-8 mt-4">
               <div>
@@ -141,7 +207,9 @@ function Landing() {
               <div className="flex items-center justify-between border-b border-gray-50 pb-4 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="flex h-2 w-2 rounded-full bg-[#E63946] animate-pulse" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Live Simulation Grid</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                    Live Simulation Grid
+                  </span>
                 </div>
                 <div className="flex gap-1.5">
                   {[0, 1, 2, 3].map((step) => (
@@ -168,36 +236,75 @@ function Landing() {
                   <rect width="100%" height="100%" fill="url(#grid)" />
 
                   {/* Route Paths */}
-                  <path 
-                    d="M 50 160 Q 150 70 200 180 T 360 120" 
-                    fill="none" 
-                    stroke="#E5E7EB" 
-                    strokeWidth="4" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M 50 160 Q 150 70 200 180 T 360 120"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="4"
+                    strokeLinecap="round"
                   />
                   {activeStep >= 1 && (
-                    <path 
-                      d="M 50 160 Q 150 70 200 180 T 360 120" 
-                      fill="none" 
-                      stroke="#E63946" 
-                      strokeWidth="4" 
-                      strokeDasharray="8 4" 
-                      className="animate-dash" 
+                    <path
+                      d="M 50 160 Q 150 70 200 180 T 360 120"
+                      fill="none"
+                      stroke="#E63946"
+                      strokeWidth="4"
+                      strokeDasharray="8 4"
+                      className="animate-dash"
                       strokeLinecap="round"
                     />
                   )}
 
                   {/* Node 1: Accident */}
-                  <circle cx="50" cy="160" r="10" fill={activeStep >= 0 ? "#E63946" : "#D1D5DB"} className={activeStep === 0 ? "animate-pulse" : ""} />
-                  {activeStep >= 0 && <circle cx="50" cy="160" r="18" fill="none" stroke="#E63946" strokeWidth="2" className="animate-ping" opacity="0.3" />}
+                  <circle
+                    cx="50"
+                    cy="160"
+                    r="10"
+                    fill={activeStep >= 0 ? "#E63946" : "#D1D5DB"}
+                    className={activeStep === 0 ? "animate-pulse" : ""}
+                  />
+                  {activeStep >= 0 && (
+                    <circle
+                      cx="50"
+                      cy="160"
+                      r="18"
+                      fill="none"
+                      stroke="#E63946"
+                      strokeWidth="2"
+                      className="animate-ping"
+                      opacity="0.3"
+                    />
+                  )}
 
                   {/* Node 2: Ambulance */}
                   <circle cx="200" cy="180" r="10" fill={activeStep >= 1 ? "#3B82F6" : "#D1D5DB"} />
-                  {activeStep === 1 && <circle cx="200" cy="180" r="18" fill="none" stroke="#3B82F6" strokeWidth="2" className="animate-ping" opacity="0.3" />}
+                  {activeStep === 1 && (
+                    <circle
+                      cx="200"
+                      cy="180"
+                      r="18"
+                      fill="none"
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                      className="animate-ping"
+                      opacity="0.3"
+                    />
+                  )}
 
                   {/* Node 3: Hospital */}
                   <circle cx="360" cy="120" r="10" fill={activeStep >= 2 ? "#22C55E" : "#D1D5DB"} />
-                  {activeStep >= 2 && <circle cx="360" cy="120" r="18" fill="none" stroke="#22C55E" strokeWidth="2" className="animate-ping" opacity="0.3" />}
+                  {activeStep >= 2 && (
+                    <circle
+                      cx="360"
+                      cy="120"
+                      r="18"
+                      fill="none"
+                      stroke="#22C55E"
+                      strokeWidth="2"
+                      className="animate-ping"
+                      opacity="0.3"
+                    />
+                  )}
                 </svg>
 
                 {/* Animated Overlays */}
@@ -236,10 +343,15 @@ function Landing() {
                     <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-2">
                       <CheckCircle2 className="h-7 w-7" />
                     </div>
-                    <h3 className="text-sm font-bold text-gray-800">Patient Admitted Successfully</h3>
-                    <p className="text-xs text-gray-500 max-w-xs mt-1">Handover finished in 8.2 min. Vitals streamed live to trauma crew throughout transport.</p>
-                    <button 
-                      onClick={() => setActiveStep(0)} 
+                    <h3 className="text-sm font-bold text-gray-800">
+                      Patient Admitted Successfully
+                    </h3>
+                    <p className="text-xs text-gray-500 max-w-xs mt-1">
+                      Handover finished in 8.2 min. Vitals streamed live to trauma crew throughout
+                      transport.
+                    </p>
+                    <button
+                      onClick={() => setActiveStep(0)}
                       className="mt-3 text-xs text-[#E63946] font-bold hover:underline"
                     >
                       Replay sequence
@@ -249,9 +361,15 @@ function Landing() {
 
                 {/* Legend Labels on map */}
                 <div className="absolute bottom-2 right-2 flex flex-col gap-1 bg-white/95 backdrop-blur-sm border border-gray-100 p-2 rounded-lg text-[10px] text-gray-500 shadow-sm font-medium">
-                  <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#E63946]" /> Accident Scene</div>
-                  <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-500" /> Responding Unit</div>
-                  <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-green-500" /> Destination Hospital</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-[#E63946]" /> Accident Scene
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-blue-500" /> Responding Unit
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-green-500" /> Destination Hospital
+                  </div>
                 </div>
               </div>
 
@@ -261,14 +379,18 @@ function Landing() {
                   { label: "Accident", desc: "Reported via App/Car" },
                   { label: "Ambulance", desc: "Assigned & Routed" },
                   { label: "Hospital", desc: "Prepared In Advance" },
-                  { label: "Delivered", desc: "ER Handover Completed" }
+                  { label: "Delivered", desc: "ER Handover Completed" },
                 ].map((s, idx) => (
-                  <div 
+                  <div
                     key={s.label}
                     onClick={() => setActiveStep(idx)}
                     className={`p-2 rounded-lg border cursor-pointer transition-all ${activeStep === idx ? "border-[#E63946]/30 bg-[#E63946]/2" : "border-gray-100 bg-gray-50 hover:bg-gray-100/55"}`}
                   >
-                    <div className={`text-xs font-bold ${activeStep === idx ? "text-[#E63946]" : "text-gray-700"}`}>{s.label}</div>
+                    <div
+                      className={`text-xs font-bold ${activeStep === idx ? "text-[#E63946]" : "text-gray-700"}`}
+                    >
+                      {s.label}
+                    </div>
                     <div className="text-[9px] text-gray-400 mt-0.5 line-clamp-1">{s.desc}</div>
                   </div>
                 ))}
@@ -281,7 +403,9 @@ function Landing() {
       {/* TRUST SECTION */}
       <section className="border-y border-gray-100 bg-[#F8F9FB] py-12">
         <div className="mx-auto max-w-7xl px-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Trusted by hospitals, municipalities & emergency responders</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+            Trusted by hospitals, municipalities & emergency responders
+          </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-75">
             {/* Elegant text placeholders representing medical/government networks */}
             <div className="text-gray-700 font-extrabold text-sm tracking-tight flex items-center gap-1.5">
@@ -311,7 +435,8 @@ function Landing() {
               Emergency Systems Were Never Built To Work Together.
             </h2>
             <p className="mt-4 text-gray-600">
-              Traditional emergency dispatch is siloed. When time stands between life and death, delays accumulate across communication gaps.
+              Traditional emergency dispatch is siloed. When time stands between life and death,
+              delays accumulate across communication gaps.
             </p>
           </div>
 
@@ -321,10 +446,19 @@ function Landing() {
                 { title: "Citizen Calls", desc: "Panicked reporting with vague location details." },
                 { title: "Dispatch Delay", desc: "Manual routing and phone coordination delays." },
                 { title: "Traffic Delay", desc: "No priority coordination on congested signals." },
-                { title: "Hospital Unaware", desc: "ER learns of patient only when ambulance pulls up." },
-                { title: "Critical Time Lost", desc: "Wasted window causing preventable fatalities." }
+                {
+                  title: "Hospital Unaware",
+                  desc: "ER learns of patient only when ambulance pulls up.",
+                },
+                {
+                  title: "Critical Time Lost",
+                  desc: "Wasted window causing preventable fatalities.",
+                },
               ].map((step, idx) => (
-                <div key={step.title} className="relative flex flex-col items-center text-center p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100">
+                <div
+                  key={step.title}
+                  className="relative flex flex-col items-center text-center p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100"
+                >
                   <div className="h-8 w-8 rounded-full bg-red-100 text-[#E63946] flex items-center justify-center font-bold text-xs mb-3">
                     {idx + 1}
                   </div>
@@ -348,7 +482,8 @@ function Landing() {
               One Network. Every Emergency.
             </h2>
             <p className="mt-3 text-gray-600">
-              AEGIS bridges critical steps into a single intelligent platform, removing manual bottlenecks.
+              AEGIS bridges critical steps into a single intelligent platform, removing manual
+              bottlenecks.
             </p>
           </div>
 
@@ -358,59 +493,72 @@ function Landing() {
                 title: "AI Dispatch",
                 icon: Brain,
                 desc: "Analyzes incoming emergency calls using real-time NLP, extracting location coordinates and medical severity to dispatch the optimal ambulance fleet within seconds.",
-                useCase: "A citizen reports a vehicle collision on NH-24. AI instantly parses coordinates, flags trauma severity, and alerts the closest unit.",
-                benefits: "Cuts manual dispatch time from 3 minutes to under 8 seconds."
+                useCase:
+                  "A citizen reports a vehicle collision on NH-24. AI instantly parses coordinates, flags trauma severity, and alerts the closest unit.",
+                benefits: "Cuts manual dispatch time from 3 minutes to under 8 seconds.",
               },
               {
                 title: "Green Corridor",
                 icon: Zap,
                 desc: "Interfaces directly with city traffic management systems, automatically turning traffic signals green along the ambulance's live GPS navigation path.",
-                useCase: "ALS unit AMB-108 travels through three major city junctions; traffic lights turn green 200m before arrival.",
-                benefits: "Reduces transit delay by 30-40% in congested urban zones."
+                useCase:
+                  "ALS unit AMB-108 travels through three major city junctions; traffic lights turn green 200m before arrival.",
+                benefits: "Reduces transit delay by 30-40% in congested urban zones.",
               },
               {
                 title: "Hospital Sync",
                 icon: Building2,
                 desc: "Streams patient vitals from the ambulance directly to the destination hospital's ER dashboard, ensuring trauma teams prepare appropriate beds and equipment.",
-                useCase: "Hospital crew views live ECG telemetry and SpO2 levels, preparing ER Bay 3 before the ambulance pulls up.",
-                benefits: "Zero transition time. Resuscitation begins immediately upon delivery."
+                useCase:
+                  "Hospital crew views live ECG telemetry and SpO2 levels, preparing ER Bay 3 before the ambulance pulls up.",
+                benefits: "Zero transition time. Resuscitation begins immediately upon delivery.",
               },
               {
                 title: "Volunteer Network",
                 icon: Users,
                 desc: "Mobilizes nearby certified citizen volunteers (CPR/First-aid trained) to administer initial assistance in the minutes before paramedics arrive.",
-                useCase: "A cardiac arrest is reported at a shopping plaza. A registered nurse shopping nearby is paged and applies CPR.",
-                benefits: "Provides critical life support during the vital first 3-5 minutes."
+                useCase:
+                  "A cardiac arrest is reported at a shopping plaza. A registered nurse shopping nearby is paged and applies CPR.",
+                benefits: "Provides critical life support during the vital first 3-5 minutes.",
               },
               {
                 title: "AI First Aid Assistant",
                 icon: Siren,
                 desc: "Provides step-by-step, personalized rescue instructions directly to the citizen caller while the ambulance is en-route.",
-                useCase: "Caller receives interactive vocal prompts and visuals on applying direct pressure to stop severe bleeding.",
-                benefits: "Stabilizes patients early and reduces panic during crisis."
+                useCase:
+                  "Caller receives interactive vocal prompts and visuals on applying direct pressure to stop severe bleeding.",
+                benefits: "Stabilizes patients early and reduces panic during crisis.",
               },
               {
                 title: "Predictive Analytics",
                 icon: Activity,
                 desc: "Uses history and spatial data to forecast accident heatmaps, allowing municipalities to pre-position ambulance units at high-risk hotspots.",
-                useCase: "During monsoon showers, AI positions three rescue units near Hindon Bridge flyover based on accident risk predictions.",
-                benefits: "Improves incident-readiness times by up to 25%."
-              }
+                useCase:
+                  "During monsoon showers, AI positions three rescue units near Hindon Bridge flyover based on accident risk predictions.",
+                benefits: "Improves incident-readiness times by up to 25%.",
+              },
             ].map((sol) => (
-              <div key={sol.title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+              <div
+                key={sol.title}
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+              >
                 <div className="h-10 w-10 rounded-lg bg-[#E63946]/5 text-[#E63946] flex items-center justify-center mb-4">
                   <sol.icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">{sol.title}</h3>
                 <p className="text-sm text-gray-600 mt-2 leading-relaxed">{sol.desc}</p>
-                
+
                 <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-gray-400">Real Use Case</span>
+                    <span className="text-[10px] uppercase font-bold text-gray-400">
+                      Real Use Case
+                    </span>
                     <p className="text-xs text-gray-700 mt-0.5">{sol.useCase}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-green-500">Key Benefit</span>
+                    <span className="text-[10px] uppercase font-bold text-green-500">
+                      Key Benefit
+                    </span>
                     <p className="text-xs font-semibold text-gray-900 mt-0.5">{sol.benefits}</p>
                   </div>
                 </div>
@@ -434,12 +582,36 @@ function Landing() {
 
           <div className="mt-16 max-w-3xl mx-auto relative pl-8 border-l border-gray-100">
             {[
-              { step: "01", title: "Emergency Reported", desc: "Citizen activates the SOS trigger on their mobile app, or a connected vehicle registers a crash event. Live GPS details stream to the grid." },
-              { step: "02", title: "AI Evaluates Situation", desc: "AEGIS's dispatch core instantly classifies severity, victim count, and clinical needs using NLP on text, audio or car sensor outputs." },
-              { step: "03", title: "Best Ambulance Selected", desc: "Algorithms select the optimal ambulance based on traffic, distance, and clinical specialties, pushing turn-by-turn routing with Green Corridor clearance." },
-              { step: "04", title: "Hospital Prepared", desc: "Hospital systems sync dynamically. An emergency trauma room and surgical teams are assigned, viewing real-time patient status." },
-              { step: "05", title: "Volunteer Network Activated", desc: "Registered CPR-certified volunteers within a 500m radius are paged, providing immediate rescue support until the unit arrives." },
-              { step: "06", title: "Patient Receives Care", desc: "Ambulance crew executes a seamless handover to the waiting trauma team with full history pre-loaded in the hospital system." }
+              {
+                step: "01",
+                title: "Emergency Reported",
+                desc: "Citizen activates the SOS trigger on their mobile app, or a connected vehicle registers a crash event. Live GPS details stream to the grid.",
+              },
+              {
+                step: "02",
+                title: "AI Evaluates Situation",
+                desc: "AEGIS's dispatch core instantly classifies severity, victim count, and clinical needs using NLP on text, audio or car sensor outputs.",
+              },
+              {
+                step: "03",
+                title: "Best Ambulance Selected",
+                desc: "Algorithms select the optimal ambulance based on traffic, distance, and clinical specialties, pushing turn-by-turn routing with Green Corridor clearance.",
+              },
+              {
+                step: "04",
+                title: "Hospital Prepared",
+                desc: "Hospital systems sync dynamically. An emergency trauma room and surgical teams are assigned, viewing real-time patient status.",
+              },
+              {
+                step: "05",
+                title: "Volunteer Network Activated",
+                desc: "Registered CPR-certified volunteers within a 500m radius are paged, providing immediate rescue support until the unit arrives.",
+              },
+              {
+                step: "06",
+                title: "Patient Receives Care",
+                desc: "Ambulance crew executes a seamless handover to the waiting trauma team with full history pre-loaded in the hospital system.",
+              },
             ].map((s) => (
               <div key={s.step} className="relative mb-12 last:mb-0">
                 <div className="absolute -left-12 top-0.5 h-8 w-8 rounded-full bg-white border border-[#E63946] flex items-center justify-center text-xs font-bold text-[#E63946]">
@@ -461,18 +633,38 @@ function Landing() {
               Creating Real Impact Across India
             </h2>
             <p className="mt-4 text-gray-600">
-              Empowering cities to combat emergency delay crises. Smart grids save lives by saving seconds.
+              Empowering cities to combat emergency delay crises. Smart grids save lives by saving
+              seconds.
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
             {[
-              { val: "4.5 Lakh+", label: "Road deaths yearly", desc: "Average fatalities recorded across Indian highways and cities." },
-              { val: "40%", label: "Potentially preventable", desc: "Injuries that could have been survived with timely trauma response." },
-              { val: "8-12 min", label: "Average delay reduced", desc: "Typical travel time saved under intelligent green corridor corridors." },
-              { val: "100+", label: "Smart cities target", desc: "Municipal integrations in pipeline to modernize city grids." }
+              {
+                val: "4.5 Lakh+",
+                label: "Road deaths yearly",
+                desc: "Average fatalities recorded across Indian highways and cities.",
+              },
+              {
+                val: "40%",
+                label: "Potentially preventable",
+                desc: "Injuries that could have been survived with timely trauma response.",
+              },
+              {
+                val: "8-12 min",
+                label: "Average delay reduced",
+                desc: "Typical travel time saved under intelligent green corridor corridors.",
+              },
+              {
+                val: "100+",
+                label: "Smart cities target",
+                desc: "Municipal integrations in pipeline to modernize city grids.",
+              },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm text-left">
+              <div
+                key={stat.label}
+                className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm text-left"
+              >
                 <div className="text-3xl font-black text-[#E63946]">{stat.val}</div>
                 <div className="text-sm font-bold text-gray-900 mt-2">{stat.label}</div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">{stat.desc}</p>
@@ -496,7 +688,9 @@ function Landing() {
                 <span className="text-green-600">Before Patients Arrive.</span>
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                AEGIS syncs ambulance vitals directly into the hospital's ER dashboard. Pre-assign resuscitation bays, reserve critical ICU beds, and alert surgical teams in real-time, removing critical handover bottlenecks.
+                AEGIS syncs ambulance vitals directly into the hospital's ER dashboard. Pre-assign
+                resuscitation bays, reserve critical ICU beds, and alert surgical teams in
+                real-time, removing critical handover bottlenecks.
               </p>
               <ul className="space-y-3.5">
                 {[
@@ -504,7 +698,10 @@ function Landing() {
                   "Automated ER Bay pre-allocation and bed booking",
                   "Instant notification logs for cardiac and trauma teams",
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-gray-700">
+                  <li
+                    key={i}
+                    className="flex items-start gap-2.5 text-sm font-medium text-gray-700"
+                  >
                     <span className="mt-1 h-2 w-2 rounded-full bg-green-500 shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -513,21 +710,42 @@ function Landing() {
             </div>
             <div className="rounded-2xl border border-gray-100 bg-[#F8F9FB] p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hospital Sync Console</span>
-                <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 border border-green-100">Active Connection</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Hospital Sync Console
+                </span>
+                <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 border border-green-100">
+                  Active Connection
+                </span>
               </div>
               <div className="space-y-3">
                 {[
-                  { name: "ER Bay 3 Allocation", desc: "Pre-reserved for AMB-1083", state: "Ready" },
-                  { name: "ICU Bed Sync", desc: "3 beds available in Trauma Ward B", state: "Active" },
-                  { name: "Surgical Team Notification", desc: "Alert dispatched to Cardiology unit", state: "Alerted" }
+                  {
+                    name: "ER Bay 3 Allocation",
+                    desc: "Pre-reserved for AMB-1083",
+                    state: "Ready",
+                  },
+                  {
+                    name: "ICU Bed Sync",
+                    desc: "3 beds available in Trauma Ward B",
+                    state: "Active",
+                  },
+                  {
+                    name: "Surgical Team Notification",
+                    desc: "Alert dispatched to Cardiology unit",
+                    state: "Alerted",
+                  },
                 ].map((log, i) => (
-                  <div key={i} className="bg-white border border-gray-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-100 p-4 rounded-xl flex items-center justify-between shadow-sm"
+                  >
                     <div>
                       <p className="text-xs font-extrabold text-gray-900">{log.name}</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">{log.desc}</p>
                     </div>
-                    <span className="text-[10px] font-extrabold text-green-600 uppercase tracking-wider bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">{log.state}</span>
+                    <span className="text-[10px] font-extrabold text-green-600 uppercase tracking-wider bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">
+                      {log.state}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -542,8 +760,12 @@ function Landing() {
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm space-y-4 order-last lg:order-first">
               <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Operator Telemetry HUD</span>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100">GPS Synced</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Operator Telemetry HUD
+                </span>
+                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100">
+                  GPS Synced
+                </span>
               </div>
               <div className="space-y-3">
                 <div className="bg-[#F8F9FB] border border-gray-100 p-4 rounded-xl space-y-2">
@@ -558,9 +780,12 @@ function Landing() {
                 {[
                   { label: "Optimal Speed Profile", val: "62 km/h" },
                   { label: "Active Traffic Overrides", val: "4 junctions overridden" },
-                  { label: "Priority Clearance Signal", val: "Locked" }
+                  { label: "Priority Clearance Signal", val: "Locked" },
                 ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center text-xs font-bold px-1 py-1">
+                  <div
+                    key={i}
+                    className="flex justify-between items-center text-xs font-bold px-1 py-1"
+                  >
                     <span className="text-gray-500">{item.label}</span>
                     <span className="text-gray-900">{item.val}</span>
                   </div>
@@ -577,7 +802,9 @@ function Landing() {
                 <span className="text-blue-600">Optimized Transit.</span>
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                Connect your ambulance fleet to AEGIS's intelligent routing engine. Automatically override municipal traffic lights to green as your vehicle approaches, and share real-time GPS telemetry with dispatchers and trauma centers.
+                Connect your ambulance fleet to AEGIS's intelligent routing engine. Automatically
+                override municipal traffic lights to green as your vehicle approaches, and share
+                real-time GPS telemetry with dispatchers and trauma centers.
               </p>
               <ul className="space-y-3.5">
                 {[
@@ -585,7 +812,10 @@ function Landing() {
                   "Real-time route profiling based on vehicular traffic grids",
                   "Turn-by-turn priority navigation on digital cockpits",
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-gray-700">
+                  <li
+                    key={i}
+                    className="flex items-start gap-2.5 text-sm font-medium text-gray-700"
+                  >
                     <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -607,7 +837,8 @@ function Landing() {
               System Integration Resources
             </h2>
             <p className="mt-3 text-gray-600">
-              Access guidelines, API schemas, and municipal configuration tools to sync AEGIS with your city grid.
+              Access guidelines, API schemas, and municipal configuration tools to sync AEGIS with
+              your city grid.
             </p>
           </div>
 
@@ -616,27 +847,33 @@ function Landing() {
               {
                 title: "Municipality Integration Guide",
                 desc: "Technical blueprint on linking AEGIS route overrides to municipal traffic controller networks.",
-                format: "PDF (2.4 MB)"
+                format: "PDF (2.4 MB)",
               },
               {
                 title: "Hospital Trauma Sync SDK",
                 desc: "Developer instructions and REST APIs to pull real-time patient vitals into custom EHR systems.",
-                format: "API Doc (v2.1)"
+                format: "API Doc (v2.1)",
               },
               {
                 title: "Responder Training Manual",
                 desc: "Standard operating procedures for ambulance drivers, trauma nurses, and civilian volunteers.",
-                format: "Online E-Book"
-              }
+                format: "Online E-Book",
+              },
             ].map((res, i) => (
-              <div key={i} className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm text-left flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div
+                key={i}
+                className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm text-left flex flex-col justify-between hover:shadow-md transition-shadow"
+              >
                 <div>
                   <h3 className="text-sm font-bold text-gray-900">{res.title}</h3>
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed">{res.desc}</p>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-[10px] font-bold">
                   <span className="text-gray-400 uppercase tracking-wider">{res.format}</span>
-                  <Link to="/login" className="text-[#E63946] hover:underline flex items-center gap-0.5">
+                  <Link
+                    to="/login"
+                    className="text-[#E63946] hover:underline flex items-center gap-0.5"
+                  >
                     Access Resource <ChevronRight className="h-3 w-3" />
                   </Link>
                 </div>
@@ -657,37 +894,71 @@ function Landing() {
               Partner With AEGIS
             </h2>
             <p className="mt-3 text-gray-600">
-              Submit an inquiry to integrate AEGIS with your local hospital network or municipal emergency grid.
+              Submit an inquiry to integrate AEGIS with your local hospital network or municipal
+              emergency grid.
             </p>
           </div>
 
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Thank you! Your partnership inquiry has been received. Our team will contact you shortly.");
+              toast.success(
+                "Thank you! Your partnership inquiry has been received. Our team will contact you shortly.",
+              );
               e.currentTarget.reset();
             }}
             className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 text-left max-w-xl mx-auto"
           >
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Full Name</label>
-                <input required type="text" placeholder="Dr. Aarav Sharma" className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Dr. Aarav Sharma"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none"
+                />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Agency / Organization</label>
-                <input required type="text" placeholder="City Care Trauma" className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Agency / Organization
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="City Care Trauma"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none"
+                />
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Official Email</label>
-              <input required type="email" placeholder="sharma@citycare.org" className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none" />
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                Official Email
+              </label>
+              <input
+                required
+                type="email"
+                placeholder="sharma@citycare.org"
+                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none"
+              />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Inquiry Details</label>
-              <textarea required rows={3} placeholder="Please tell us about your deployment timeline or integration requirements..." className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none" />
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                Inquiry Details
+              </label>
+              <textarea
+                required
+                rows={3}
+                placeholder="Please tell us about your deployment timeline or integration requirements..."
+                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#E63946] focus:outline-none"
+              />
             </div>
-            <button type="submit" className="w-full rounded-xl bg-[#E63946] hover:bg-[#C32F3A] py-3 text-xs font-bold text-white transition-all shadow-md active:scale-95 cursor-pointer text-center">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-[#E63946] hover:bg-[#C32F3A] py-3 text-xs font-bold text-white transition-all shadow-md active:scale-95 cursor-pointer text-center"
+            >
               Send Message
             </button>
           </form>
@@ -705,30 +976,69 @@ function Landing() {
               <span className="font-bold text-[#111111]">AEGIS</span>
             </div>
             <p className="text-xs text-gray-500 leading-relaxed">
-              AI-powered emergency response network connecting citizens, ambulances, and hospitals to save lives when seconds count.
+              AI-powered emergency response network connecting citizens, ambulances, and hospitals
+              to save lives when seconds count.
             </p>
           </div>
           <div>
             <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider">Solutions</h4>
             <ul className="mt-3 space-y-2 text-xs text-gray-500">
-              <li><Link to="/login" className="hover:text-[#E63946]">AI Dispatch Core</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Green Corridor Control</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Hospital Bed Sync</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Volunteer Coordination</Link></li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  AI Dispatch Core
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Green Corridor Control
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Hospital Bed Sync
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Volunteer Coordination
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider">Portals</h4>
             <ul className="mt-3 space-y-2 text-xs text-gray-500">
-              <li><Link to="/login" className="hover:text-[#E63946]">Citizen SOS Portal</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Hospital ER console</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Ambulance Cockpit</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Responder Network</Link></li>
-              <li><Link to="/login" className="hover:text-[#E63946]">Admin Command Center</Link></li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Citizen SOS Portal
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Hospital ER console
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Ambulance Cockpit
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Responder Network
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E63946]">
+                  Admin Command Center
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider">Contact & Support</h4>
+            <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+              Contact & Support
+            </h4>
             <ul className="mt-3 space-y-2 text-xs text-gray-500">
               <li>HQ: New Delhi, India</li>
               <li>Email: contact@aegis.org</li>
@@ -739,9 +1049,15 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-6 border-t border-gray-50 mt-8 pt-6 flex flex-wrap justify-between items-center text-[11px] text-gray-400">
           <p>© 2026 AEGIS. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:underline">Privacy Policy</a>
-            <a href="#" className="hover:underline">Terms of Service</a>
-            <a href="#" className="hover:underline">ISO 27001 Certified</a>
+            <a href="#" className="hover:underline">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:underline">
+              Terms of Service
+            </a>
+            <a href="#" className="hover:underline">
+              ISO 27001 Certified
+            </a>
           </div>
         </div>
       </footer>

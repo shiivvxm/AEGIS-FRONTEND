@@ -47,47 +47,48 @@
 :root {
   --radius: 0.75rem;
   /* Premium Light Theme */
-  --background: #FFFFFF;
+  --background: #ffffff;
   --foreground: #111111;
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #111111;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #111111;
-  --primary: #E63946;          /* AEGIS Red */
-  --primary-foreground: #FFFFFF;
-  --secondary: #F8F9FB;
+  --primary: #e63946; /* AEGIS Red */
+  --primary-foreground: #ffffff;
+  --secondary: #f8f9fb;
   --secondary-foreground: #111111;
-  --muted: #E5E7EB;
+  --muted: #e5e7eb;
   --muted-foreground: #525866;
-  --accent: #F8F9FB;
-  --accent-foreground: #E63946;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E5E7EB;
-  --input: #FFFFFF;
-  --ring: #E63946;
+  --accent: #f8f9fb;
+  --accent-foreground: #e63946;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #ffffff;
+  --ring: #e63946;
 
-  --emergency: #E63946;
-  --emergency-foreground: #FFFFFF;
-  --medical: #0284C7;
-  --medical-foreground: #FFFFFF;
-  --success: #22C55E;
-  --success-foreground: #FFFFFF;
-  --warning: #F59E0B;
-  --warning-foreground: #FFFFFF;
+  --emergency: #e63946;
+  --emergency-foreground: #ffffff;
+  --medical: #0284c7;
+  --medical-foreground: #ffffff;
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
 
-  --chart-1: #E63946;
-  --chart-2: #0284C7;
-  --chart-3: #22C55E;
-  --chart-4: #F59E0B;
-  --chart-5: #8B5CF6;
+  --chart-1: #e63946;
+  --chart-2: #0284c7;
+  --chart-3: #22c55e;
+  --chart-4: #f59e0b;
+  --chart-5: #8b5cf6;
 
-  --gradient-emergency: linear-gradient(135deg, #E63946, #C32F3A);
-  --gradient-medical: linear-gradient(135deg, #0ea5e9, #0284C7);
-  --gradient-success: linear-gradient(135deg, #22C55E, #16A34A);
-  --gradient-hero: radial-gradient(circle at 10% 20%, rgba(230, 57, 70, 0.04), transparent 45%),
-                   radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.04), transparent 45%),
-                   linear-gradient(180deg, #FFFFFF, #F8F9FB);
+  --gradient-emergency: linear-gradient(135deg, #e63946, #c32f3a);
+  --gradient-medical: linear-gradient(135deg, #0ea5e9, #0284c7);
+  --gradient-success: linear-gradient(135deg, #22c55e, #16a34a);
+  --gradient-hero:
+    radial-gradient(circle at 10% 20%, rgba(230, 57, 70, 0.04), transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.04), transparent 45%),
+    linear-gradient(180deg, #ffffff, #f8f9fb);
 
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(229, 231, 235, 0.8);
@@ -103,13 +104,21 @@
   html {
     scroll-behavior: smooth;
   }
-  html, body, #root {
+  html,
+  body,
+  #root {
     min-height: 100%;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
     background-image:
       radial-gradient(circle at top, rgba(230, 57, 70, 0.02), transparent 400px),
       radial-gradient(circle at bottom right, rgba(2, 132, 199, 0.02), transparent 400px);
@@ -144,100 +153,178 @@
   color: transparent;
 }
 
-@utility bg-gradient-emergency { background: var(--gradient-emergency); }
-@utility bg-gradient-medical { background: var(--gradient-medical); }
-@utility bg-gradient-success { background: var(--gradient-success); }
-@utility bg-gradient-hero { background: var(--gradient-hero); }
+@utility bg-gradient-emergency {
+  background: var(--gradient-emergency);
+}
+@utility bg-gradient-medical {
+  background: var(--gradient-medical);
+}
+@utility bg-gradient-success {
+  background: var(--gradient-success);
+}
+@utility bg-gradient-hero {
+  background: var(--gradient-hero);
+}
 
 @utility pulse-emergency {
   animation: pulse-emergency 2s ease-in-out infinite;
 }
 @keyframes pulse-emergency {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.65 0.25 25 / 60%); }
-  50% { box-shadow: 0 0 0 16px oklch(0.65 0.25 25 / 0%); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.65 0.25 25 / 60%);
+  }
+  50% {
+    box-shadow: 0 0 0 16px oklch(0.65 0.25 25 / 0%);
+  }
 }
 
 @utility pulse-medical {
   animation: pulse-medical 2s ease-in-out infinite;
 }
 @keyframes pulse-medical {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.62 0.2 245 / 60%); }
-  50% { box-shadow: 0 0 0 14px oklch(0.62 0.2 245 / 0%); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.62 0.2 245 / 60%);
+  }
+  50% {
+    box-shadow: 0 0 0 14px oklch(0.62 0.2 245 / 0%);
+  }
 }
 
 @keyframes ping-ring {
-  0% { transform: scale(0.6); opacity: 0.9; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 @utility ping-ring {
   animation: ping-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-@utility fade-up { animation: fade-up 0.5s ease-out both; }
+@utility fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
 
 @keyframes dash {
-  to { stroke-dashoffset: -100; }
+  to {
+    stroke-dashoffset: -100;
+  }
 }
-@utility animate-dash { animation: dash 2s linear infinite; }
+@utility animate-dash {
+  animation: dash 2s linear infinite;
+}
 
 @keyframes spin-slow {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-@utility spin-slow { animation: spin-slow 12s linear infinite; }
+@utility spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
 
 /* AEGIS Command Center Animations */
 @keyframes cctv-scan {
-  0% { top: 0%; opacity: 0.8; }
-  49% { top: 100%; opacity: 0.2; }
-  50% { top: 0%; opacity: 0; }
-  100% { top: 0%; opacity: 0; }
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  49% {
+    top: 100%;
+    opacity: 0.2;
+  }
+  50% {
+    top: 0%;
+    opacity: 0;
+  }
+  100% {
+    top: 0%;
+    opacity: 0;
+  }
 }
 @utility animate-cctv-scan {
   animation: cctv-scan 4s linear infinite;
 }
 
 @keyframes agent-processing {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
 }
 @utility animate-agent-processing {
   animation: agent-processing 1.5s ease-in-out infinite;
 }
 
 @keyframes corridor-flash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 @utility animate-corridor-flash {
   animation: corridor-flash 1.2s ease-in-out infinite;
 }
 
 @keyframes blink-rec {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 @utility animate-blink {
   animation: blink-rec 1s step-end infinite;
 }
 
 @keyframes slide-in-right {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 @utility animate-slide-in {
   animation: slide-in-right 0.3s ease-out both;
 }
 
 @keyframes scan-beam {
-  0% { top: 0%; }
-  50% { top: 100%; }
-  100% { top: 0%; }
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 0%;
+  }
 }
 @utility animate-scan-beam {
   animation: scan-beam 5s infinite linear;
 }
-

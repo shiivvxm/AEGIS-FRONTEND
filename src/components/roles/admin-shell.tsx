@@ -75,7 +75,9 @@ export function AdminShell({
               </div>
               <div>
                 <div className="text-sm font-bold">Admin Command Center</div>
-                <div className="text-[10px] text-white/50">{region} · {name}</div>
+                <div className="text-[10px] text-white/50">
+                  {region} · {name}
+                </div>
               </div>
             </div>
           </div>
@@ -104,7 +106,9 @@ export function AdminShell({
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
                   "flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wide transition-colors lg:px-4 lg:text-xs",
-                  active ? "border-[#E63946] text-white" : "border-transparent text-white/45 hover:text-white/75",
+                  active
+                    ? "border-[#E63946] text-white"
+                    : "border-transparent text-white/45 hover:text-white/75",
                 )}
               >
                 <tab.icon className="h-3.5 w-3.5" />

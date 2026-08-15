@@ -14,7 +14,15 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { AegisBrand } from "@/components/design-system";
 
-export type HospitalTab = "overview" | "patients" | "beds" | "staff" | "resources" | "analytics" | "settings" | "profile";
+export type HospitalTab =
+  | "overview"
+  | "patients"
+  | "beds"
+  | "staff"
+  | "resources"
+  | "analytics"
+  | "settings"
+  | "profile";
 
 const NAV: { id: HospitalTab; label: string; icon: LucideIcon }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -48,7 +56,11 @@ export function HospitalShell({
   const operatorName = getDisplayName("hospital", user);
 
   const initials = operatorName
-    ? operatorName.split(" ").map((s) => s[0]).slice(0, 2).join("")
+    ? operatorName
+        .split(" ")
+        .map((s) => s[0])
+        .slice(0, 2)
+        .join("")
     : "HA";
 
   return (
@@ -59,8 +71,12 @@ export function HospitalShell({
           <div className="mt-3 flex items-center gap-2">
             <Building2 className="h-4 w-4 text-medical" />
             <div>
-              <div className="text-xs font-bold text-[#111111] truncate max-w-[130px]">{hospitalName}</div>
-              <div className="text-[10px] text-[#525866] truncate max-w-[130px]">{hospitalType}</div>
+              <div className="text-xs font-bold text-[#111111] truncate max-w-[130px]">
+                {hospitalName}
+              </div>
+              <div className="text-[10px] text-[#525866] truncate max-w-[130px]">
+                {hospitalType}
+              </div>
             </div>
           </div>
         </div>
@@ -96,12 +112,18 @@ export function HospitalShell({
               </h1>
               <p className="text-xs text-[#525866]">Hospital Operations Portal</p>
             </div>
-              <div className="flex items-center gap-3">
-                {statusBadge}
-                <button type="button" onClick={() => onTabChange("profile")} aria-label="Open profile">
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-[#E63946]/10 text-sm font-bold text-[#E63946]">{initials}</div>
-                </button>
-              </div>
+            <div className="flex items-center gap-3">
+              {statusBadge}
+              <button
+                type="button"
+                onClick={() => onTabChange("profile")}
+                aria-label="Open profile"
+              >
+                <div className="grid h-9 w-9 place-items-center rounded-full bg-[#E63946]/10 text-sm font-bold text-[#E63946]">
+                  {initials}
+                </div>
+              </button>
+            </div>
           </div>
           <div className="mt-3 flex gap-1 overflow-x-auto lg:hidden">
             {NAV.map((item) => (

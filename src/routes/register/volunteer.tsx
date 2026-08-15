@@ -43,14 +43,23 @@ const volunteerSchema = z
     idNumber: z.string().min(2, "Government / Volunteer ID Number is required"),
     idProof: z
       .any()
-      .refine((val) => val !== null && val !== undefined && val !== "", "ID Proof document is required"),
+      .refine(
+        (val) => val !== null && val !== undefined && val !== "",
+        "ID Proof document is required",
+      ),
     emergencyContactName: z.string().min(2, "Emergency Contact Name is required"),
-    emergencyContactNumber: z.string().regex(/^[0-9]{10}$/, "Emergency contact number must be 10 digits"),
+    emergencyContactNumber: z
+      .string()
+      .regex(/^[0-9]{10}$/, "Emergency contact number must be 10 digits"),
     relationship: z.string().min(1, "Please select relationship"),
-    preferredResponseTypes: z.array(z.string()).min(1, "Select at least one preferred response type"),
+    preferredResponseTypes: z
+      .array(z.string())
+      .min(1, "Select at least one preferred response type"),
     emergencyDispatchAvailable: z.string().min(1, "Please select emergency dispatch availability"),
     infoConsent: z.boolean().refine((val) => val === true, "You must confirm information accuracy"),
-    policyConsent: z.boolean().refine((val) => val === true, "You must agree to AEGIS volunteer response policies"),
+    policyConsent: z
+      .boolean()
+      .refine((val) => val === true, "You must agree to AEGIS volunteer response policies"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -159,9 +168,7 @@ function VolunteerFileUpload({
           <p className="text-xs font-bold text-gray-700">
             Click to <span className="text-purple-600 underline">Upload ID Proof</span>
           </p>
-          <p className="text-[10px] text-gray-400 mt-0.5 font-medium">
-            PDF, PNG, JPG (max 5MB)
-          </p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-medium">PDF, PNG, JPG (max 5MB)</p>
         </button>
       )}
     </div>
@@ -261,8 +268,8 @@ function VolunteerRegister() {
         data.idProof instanceof File
           ? data.idProof.name
           : typeof data.idProof === "string"
-          ? data.idProof
-          : "Government_ID.pdf";
+            ? data.idProof
+            : "Government_ID.pdf";
 
       const payload = {
         fullName: data.fullName,
@@ -351,7 +358,10 @@ function VolunteerRegister() {
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-purple-600 animate-pulse rounded-full" style={{ width: "90%" }} />
+                  <div
+                    className="h-full bg-purple-600 animate-pulse rounded-full"
+                    style={{ width: "90%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -389,7 +399,9 @@ function VolunteerRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 focus:outline-none transition-all"
                     />
                     {errors.fullName?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.fullName.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.fullName.message)}
+                      </p>
                     )}
                   </div>
 
@@ -404,7 +416,9 @@ function VolunteerRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 focus:outline-none transition-all"
                     />
                     {errors.email?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.email.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.email.message)}
+                      </p>
                     )}
                   </div>
 
@@ -425,7 +439,9 @@ function VolunteerRegister() {
                       />
                     </div>
                     {errors.mobileNumber?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.mobileNumber.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.mobileNumber.message)}
+                      </p>
                     )}
                   </div>
 
@@ -434,9 +450,15 @@ function VolunteerRegister() {
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         Password
                       </label>
-                      <PasswordInput showStrength {...register("password")} placeholder="••••••••" />
+                      <PasswordInput
+                        showStrength
+                        {...register("password")}
+                        placeholder="••••••••"
+                      />
                       {errors.password?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.password.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.password.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -445,7 +467,9 @@ function VolunteerRegister() {
                       </label>
                       <PasswordInput {...register("confirmPassword")} placeholder="••••••••" />
                       {errors.confirmPassword?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.confirmPassword.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.confirmPassword.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -466,7 +490,9 @@ function VolunteerRegister() {
                         className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs focus:border-[#7C3AED] focus:outline-none bg-white"
                       />
                       {errors.dob?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.dob.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.dob.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -480,7 +506,9 @@ function VolunteerRegister() {
                         className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs focus:border-[#7C3AED] focus:outline-none"
                       />
                       {errors.city?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.city.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.city.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -494,7 +522,9 @@ function VolunteerRegister() {
                         className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs focus:border-[#7C3AED] focus:outline-none"
                       />
                       {errors.state?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.state.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.state.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -515,7 +545,9 @@ function VolunteerRegister() {
                         <option value="5km">5 kilometers</option>
                       </select>
                       {errors.availabilityRadius?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.availabilityRadius.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.availabilityRadius.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -537,7 +569,9 @@ function VolunteerRegister() {
                         <option value="AB-">AB-</option>
                       </select>
                       {errors.bloodGroup?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.bloodGroup.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.bloodGroup.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -566,7 +600,9 @@ function VolunteerRegister() {
                       })}
                     </div>
                     {errors.skills?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.skills.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.skills.message)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -591,7 +627,9 @@ function VolunteerRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-600/10 focus:outline-none transition-all"
                       />
                       {errors.idNumber?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.idNumber.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.idNumber.message)}
+                        </p>
                       )}
                     </div>
 
@@ -608,7 +646,9 @@ function VolunteerRegister() {
                         )}
                       />
                       {errors.idProof?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.idProof.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.idProof.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -629,7 +669,9 @@ function VolunteerRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-600/10 focus:outline-none transition-all"
                       />
                       {errors.emergencyContactName?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactName.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.emergencyContactName.message)}
+                        </p>
                       )}
                     </div>
 
@@ -651,7 +693,9 @@ function VolunteerRegister() {
                           />
                         </div>
                         {errors.emergencyContactNumber?.message && (
-                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContactNumber.message)}</p>
+                          <p className="text-[10px] text-red-500 font-bold mt-1">
+                            ⚠️ {String(errors.emergencyContactNumber.message)}
+                          </p>
                         )}
                       </div>
 
@@ -671,7 +715,9 @@ function VolunteerRegister() {
                           ))}
                         </select>
                         {errors.relationship?.message && (
-                          <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.relationship.message)}</p>
+                          <p className="text-[10px] text-red-500 font-bold mt-1">
+                            ⚠️ {String(errors.relationship.message)}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -706,7 +752,9 @@ function VolunteerRegister() {
                         })}
                       </div>
                       {errors.preferredResponseTypes?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.preferredResponseTypes.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.preferredResponseTypes.message)}
+                        </p>
                       )}
                     </div>
 
@@ -719,7 +767,9 @@ function VolunteerRegister() {
                           <button
                             type="button"
                             key={opt}
-                            onClick={() => setValue("emergencyDispatchAvailable", opt, { shouldValidate: true })}
+                            onClick={() =>
+                              setValue("emergencyDispatchAvailable", opt, { shouldValidate: true })
+                            }
                             className={`flex-1 py-2.5 rounded-xl border text-xs font-bold text-center transition-all ${
                               selectedDispatchAvailable === opt
                                 ? "border-purple-600/40 bg-purple-50 text-purple-700 shadow-sm"
@@ -731,7 +781,9 @@ function VolunteerRegister() {
                         ))}
                       </div>
                       {errors.emergencyDispatchAvailable?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyDispatchAvailable.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.emergencyDispatchAvailable.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -752,7 +804,9 @@ function VolunteerRegister() {
                       </span>
                     </label>
                     {errors.infoConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.infoConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.infoConsent.message)}
+                      </p>
                     )}
 
                     <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
@@ -766,7 +820,9 @@ function VolunteerRegister() {
                       </span>
                     </label>
                     {errors.policyConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.policyConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.policyConsent.message)}
+                      </p>
                     )}
                   </div>
                 </div>

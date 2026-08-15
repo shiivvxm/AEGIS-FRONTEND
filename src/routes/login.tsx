@@ -3,9 +3,20 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { 
-  HeartPulse, Shield, Ambulance, Building2, Users, TrafficCone,
-  ChevronRight, Lock, Mail, Phone, Activity, Sparkles, AlertTriangle 
+import {
+  HeartPulse,
+  Shield,
+  Ambulance,
+  Building2,
+  Users,
+  TrafficCone,
+  ChevronRight,
+  Lock,
+  Mail,
+  Phone,
+  Activity,
+  Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { useAuth, type Role } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -14,8 +25,12 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Portal Access · AEGIS" },
-      { name: "description", content: "Access the AEGIS Emergency Response Platform. Select your portal: Citizen, First Responder, Ambulance Operator, Hospital Admin, Command Officer, or Traffic Police." }
-    ]
+      {
+        name: "description",
+        content:
+          "Access the AEGIS Emergency Response Platform. Select your portal: Citizen, First Responder, Ambulance Operator, Hospital Admin, Command Officer, or Traffic Police.",
+      },
+    ],
   }),
   component: LoginPortal,
 });
@@ -27,7 +42,10 @@ const emailLoginSchema = z.object({
 });
 
 const phoneLoginSchema = z.object({
-  phone: z.string().min(1, "Mobile number is required").regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
+  phone: z
+    .string()
+    .min(1, "Mobile number is required")
+    .regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
   code: z.string().min(1, "Verification code is required"),
   role: z.string().min(1, "Please select your portal role"),
 });
@@ -53,7 +71,7 @@ const PORTAL_ROLES: {
     icon: HeartPulse,
     color: "text-[#E63946]",
     border: "border-[#E63946]/10",
-    bg: "bg-[#E63946]/5"
+    bg: "bg-[#E63946]/5",
   },
   {
     key: "volunteer",
@@ -63,7 +81,7 @@ const PORTAL_ROLES: {
     icon: Users,
     color: "text-purple-600",
     border: "border-purple-600/10",
-    bg: "bg-purple-600/5"
+    bg: "bg-purple-600/5",
   },
   {
     key: "ambulance",
@@ -73,7 +91,7 @@ const PORTAL_ROLES: {
     icon: Ambulance,
     color: "text-amber-600",
     border: "border-amber-600/10",
-    bg: "bg-amber-600/5"
+    bg: "bg-amber-600/5",
   },
   {
     key: "hospital",
@@ -83,7 +101,7 @@ const PORTAL_ROLES: {
     icon: Building2,
     color: "text-blue-600",
     border: "border-blue-600/10",
-    bg: "bg-blue-600/5"
+    bg: "bg-blue-600/5",
   },
   {
     key: "traffic",
@@ -93,7 +111,7 @@ const PORTAL_ROLES: {
     icon: TrafficCone,
     color: "text-emerald-600",
     border: "border-emerald-600/10",
-    bg: "bg-emerald-600/5"
+    bg: "bg-emerald-600/5",
   },
   {
     key: "admin",
@@ -103,7 +121,7 @@ const PORTAL_ROLES: {
     icon: Shield,
     color: "text-slate-700",
     border: "border-slate-700/10",
-    bg: "bg-slate-700/5"
+    bg: "bg-slate-700/5",
   },
 ];
 
@@ -117,12 +135,12 @@ function LoginPortal() {
 
   const emailForm = useForm<EmailLoginData>({
     resolver: zodResolver(emailLoginSchema),
-    defaultValues: { role: "" }
+    defaultValues: { role: "" },
   });
 
   const phoneForm = useForm<PhoneLoginData>({
     resolver: zodResolver(phoneLoginSchema),
-    defaultValues: { role: "", code: "123456" } // Default testing code
+    defaultValues: { role: "", code: "123456" }, // Default testing code
   });
 
   const handleRoleSelect = (role: Role) => {
@@ -166,7 +184,7 @@ function LoginPortal() {
     try {
       const loggedUser = await login(data.role as Role, data.email, data.password);
       toast.success(`Welcome back, ${loggedUser.name}!`);
-      
+
       const roleLower = loggedUser.role ? String(loggedUser.role).trim().toLowerCase() : "";
       // Role-specific redirect
       if (roleLower === "citizen") navigate({ to: "/citizen" });
@@ -188,7 +206,7 @@ function LoginPortal() {
       // For mock phone authentication, log in using mobile number as the match
       const loggedUser = await login(data.role as Role, data.phone, data.code);
       toast.success(`Welcome back, ${loggedUser.name}!`);
-      
+
       const roleLower = loggedUser.role ? String(loggedUser.role).trim().toLowerCase() : "";
       // Role-specific redirect
       if (roleLower === "citizen") navigate({ to: "/citizen" });
@@ -208,8 +226,15 @@ function LoginPortal() {
     <div className="min-h-screen flex font-sans selection:bg-[#E63946]/10 selection:text-[#E63946]">
       {/* LEFT PANEL - Network Visualization & platform summary */}
       <div className="hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col justify-between bg-[#0B0D11] relative overflow-hidden p-10">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
         {/* Brand */}
         <Link to="/" className="relative z-10 inline-flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#E63946] to-[#C32F3A] flex items-center justify-center shadow-lg shadow-[#E63946]/30 animate-pulse">
@@ -217,7 +242,9 @@ function LoginPortal() {
           </div>
           <div className="leading-tight">
             <div className="font-extrabold text-xl text-white tracking-tight">AEGIS</div>
-            <div className="text-[9px] uppercase tracking-widest text-[#E63946] font-extrabold">Protect. Respond. Save Lives.</div>
+            <div className="text-[9px] uppercase tracking-widest text-[#E63946] font-extrabold">
+              Protect. Respond. Save Lives.
+            </div>
           </div>
         </Link>
 
@@ -231,7 +258,8 @@ function LoginPortal() {
             Seamless Gateway to Metropolitan Emergency Care.
           </h2>
           <p className="text-sm text-gray-400 leading-relaxed">
-            AEGIS unifies response dispatches across citizens, volunteers, paramedics, and trauma surgical teams. Log in to coordinate local grids.
+            AEGIS unifies response dispatches across citizens, volunteers, paramedics, and trauma
+            surgical teams. Log in to coordinate local grids.
           </p>
         </div>
 
@@ -244,7 +272,9 @@ function LoginPortal() {
           ].map(({ value, label }) => (
             <div key={label} className="text-left">
               <p className="text-lg font-extrabold text-white">{value}</p>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">{label}</p>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">
+                {label}
+              </p>
             </div>
           ))}
         </div>
@@ -252,7 +282,6 @@ function LoginPortal() {
 
       {/* RIGHT PANEL - Unified Sign In Portal */}
       <div className="flex-1 flex flex-col justify-center items-center py-12 px-6 sm:px-10 bg-[#F8F9FB] overflow-y-auto">
-        
         {/* Mobile Header Banner */}
         <div className="lg:hidden mb-6 text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2">
@@ -261,7 +290,9 @@ function LoginPortal() {
             </div>
             <div className="leading-tight text-left">
               <span className="font-extrabold text-lg text-gray-900 block">AEGIS</span>
-              <span className="text-[8px] uppercase tracking-widest text-[#E63946] font-bold">Smart Dispatch</span>
+              <span className="text-[8px] uppercase tracking-widest text-[#E63946] font-bold">
+                Smart Dispatch
+              </span>
             </div>
           </Link>
         </div>
@@ -277,8 +308,12 @@ function LoginPortal() {
         <div className="w-full max-w-md bg-white rounded-3xl border border-gray-150 p-6 sm:p-8 shadow-sm">
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Log In Portal</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Access role dashboards, dispatch feeds and clinical files.</p>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                Log In Portal
+              </h1>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Access role dashboards, dispatch feeds and clinical files.
+              </p>
             </div>
 
             {/* Portal Role Selector */}
@@ -302,14 +337,20 @@ function LoginPortal() {
                       }`}
                       title={role.title}
                     >
-                      <Icon className={`h-5 w-5 ${isSelected ? "scale-110" : "text-gray-400 group-hover:text-gray-600"}`} />
-                      <span className="text-[9px] font-bold mt-1.5 leading-tight text-center break-words max-w-full px-0.5">{role.shortLabel}</span>
+                      <Icon
+                        className={`h-5 w-5 ${isSelected ? "scale-110" : "text-gray-400 group-hover:text-gray-600"}`}
+                      />
+                      <span className="text-[9px] font-bold mt-1.5 leading-tight text-center break-words max-w-full px-0.5">
+                        {role.shortLabel}
+                      </span>
                     </button>
                   );
                 })}
               </div>
               {emailForm.formState.errors.role && (
-                <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {emailForm.formState.errors.role.message}</p>
+                <p className="text-[10px] text-red-500 font-bold mt-1">
+                  ⚠️ {emailForm.formState.errors.role.message}
+                </p>
               )}
             </div>
 
@@ -319,7 +360,9 @@ function LoginPortal() {
                 type="button"
                 onClick={() => setLoginMethod("email")}
                 className={`text-xs font-bold pb-1 transition-all ${
-                  loginMethod === "email" ? "text-gray-900 border-b-2 border-gray-900" : "text-gray-400 hover:text-gray-600"
+                  loginMethod === "email"
+                    ? "text-gray-900 border-b-2 border-gray-900"
+                    : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 Email Access
@@ -328,7 +371,9 @@ function LoginPortal() {
                 type="button"
                 onClick={() => setLoginMethod("phone")}
                 className={`text-xs font-bold pb-1 transition-all ${
-                  loginMethod === "phone" ? "text-gray-900 border-b-2 border-b-gray-900" : "text-gray-400 hover:text-gray-600"
+                  loginMethod === "phone"
+                    ? "text-gray-900 border-b-2 border-b-gray-900"
+                    : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 Phone Access
@@ -337,9 +382,14 @@ function LoginPortal() {
 
             {/* EMAIL ACCESS FORM */}
             {loginMethod === "email" && (
-              <form onSubmit={emailForm.handleSubmit(onEmailSubmit, onInvalidSubmit)} className="space-y-4">
+              <form
+                onSubmit={emailForm.handleSubmit(onEmailSubmit, onInvalidSubmit)}
+                className="space-y-4"
+              >
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Official Email</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Official Email
+                  </label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
@@ -350,14 +400,21 @@ function LoginPortal() {
                     />
                   </div>
                   {emailForm.formState.errors.email && (
-                    <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {emailForm.formState.errors.email.message}</p>
+                    <p className="text-[10px] text-red-500 font-bold mt-1">
+                      ⚠️ {emailForm.formState.errors.email.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Password</label>
-                    <Link to="/forgot-password" className="text-[10px] font-bold text-[#E63946] hover:underline">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Password
+                    </label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-[10px] font-bold text-[#E63946] hover:underline"
+                    >
                       Forgot Password?
                     </Link>
                   </div>
@@ -371,14 +428,21 @@ function LoginPortal() {
                     />
                   </div>
                   {emailForm.formState.errors.password && (
-                    <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {emailForm.formState.errors.password.message}</p>
+                    <p className="text-[10px] text-red-500 font-bold mt-1">
+                      ⚠️ {emailForm.formState.errors.password.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded text-gray-950 focus:ring-gray-900 h-4.5 w-4.5" />
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Keep session active</span>
+                    <input
+                      type="checkbox"
+                      className="rounded text-gray-950 focus:ring-gray-900 h-4.5 w-4.5"
+                    />
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                      Keep session active
+                    </span>
                   </label>
                 </div>
 
@@ -404,11 +468,18 @@ function LoginPortal() {
 
             {/* PHONE ACCESS FORM */}
             {loginMethod === "phone" && (
-              <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit, onInvalidSubmit)} className="space-y-4">
+              <form
+                onSubmit={phoneForm.handleSubmit(onPhoneSubmit, onInvalidSubmit)}
+                className="space-y-4"
+              >
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Registered Mobile Number</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Registered Mobile Number
+                  </label>
                   <div className="flex gap-2">
-                    <span className="inline-flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">+91</span>
+                    <span className="inline-flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">
+                      +91
+                    </span>
                     <div className="relative flex-1">
                       <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
@@ -421,14 +492,18 @@ function LoginPortal() {
                     </div>
                   </div>
                   {phoneForm.formState.errors.phone && (
-                    <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {phoneForm.formState.errors.phone.message}</p>
+                    <p className="text-[10px] text-red-500 font-bold mt-1">
+                      ⚠️ {phoneForm.formState.errors.phone.message}
+                    </p>
                   )}
                 </div>
 
                 {verificationSent ? (
                   <div className="space-y-4 animate-fade-in">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">OTP Code</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        OTP Code
+                      </label>
                       <input
                         type="text"
                         maxLength={6}
@@ -437,7 +512,9 @@ function LoginPortal() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-center tracking-widest font-mono focus:border-gray-950 focus:outline-none transition-all"
                       />
                       {phoneForm.formState.errors.code && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {phoneForm.formState.errors.code.message}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {phoneForm.formState.errors.code.message}
+                        </p>
                       )}
                     </div>
 

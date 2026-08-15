@@ -43,11 +43,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (!asChild) {
       return (
-        <MotionButton className={cn(buttonVariants({ variant, size, className }))} ref={ref as any} {...(props as any)} />
+        <MotionButton
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref as any}
+          {...(props as any)}
+        />
       );
     }
 
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+    return (
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+    );
   },
 );
 Button.displayName = "Button";

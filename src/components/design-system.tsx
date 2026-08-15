@@ -32,7 +32,9 @@ export function StatCard({
       <div className="flex items-start justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#525866]">{label}</p>
-          <p className="mt-2 text-3xl font-bold tabular-nums tracking-tight text-[#111111]">{value}</p>
+          <p className="mt-2 text-3xl font-bold tabular-nums tracking-tight text-[#111111]">
+            {value}
+          </p>
           {hint && <p className="mt-1 text-xs text-[#525866]">{hint}</p>}
         </div>
         {Icon && (
@@ -70,11 +72,15 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm", className)}>
+    <section
+      className={cn("rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm", className)}
+    >
       <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="min-w-0">
           <h2 className="truncate text-base font-bold text-[#111111]">{title}</h2>
-          {description && <p className="truncate text-xs font-medium text-[#525866]">{description}</p>}
+          {description && (
+            <p className="truncate text-xs font-medium text-[#525866]">{description}</p>
+          )}
         </div>
         {actions && <div className="shrink-0">{actions}</div>}
       </div>
@@ -114,7 +120,9 @@ export function AegisBrand({ compact, to }: { compact?: boolean; to?: string }) 
       {!compact && (
         <div className="leading-tight">
           <div className="text-sm font-bold tracking-tight text-[#111111]">AEGIS</div>
-          <div className="text-[9px] font-semibold uppercase tracking-widest text-[#525866]">Protect. Respond. Save Lives.</div>
+          <div className="text-[9px] font-semibold uppercase tracking-widest text-[#525866]">
+            Protect. Respond. Save Lives.
+          </div>
         </div>
       )}
     </div>

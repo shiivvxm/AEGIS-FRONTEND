@@ -26,7 +26,9 @@ export function AppShell({
             </div>
             <div className="leading-tight">
               <div className="font-bold tracking-tight">AEGIS</div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[#525866]">Protect. Respond. Save Lives.</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[#525866]">
+                Protect. Respond. Save Lives.
+              </div>
             </div>
           </Link>
           <Link to="/login" className="text-sm font-semibold text-[#525866] hover:text-[#111111]">

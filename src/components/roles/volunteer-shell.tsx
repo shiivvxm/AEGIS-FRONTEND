@@ -5,7 +5,13 @@ import { cn } from "@/lib/utils";
 import { AegisBrand } from "@/components/design-system";
 import { Avatar } from "@/components/ui/avatar";
 
-export type VolunteerTab = "incidents" | "requests" | "training" | "achievements" | "history" | "profile";
+export type VolunteerTab =
+  | "incidents"
+  | "requests"
+  | "training"
+  | "achievements"
+  | "history"
+  | "profile";
 
 const TABS: { id: VolunteerTab; label: string; icon: LucideIcon; description: string }[] = [
   { id: "incidents", label: "Incidents", icon: MapPin, description: "Nearby emergencies" },
@@ -49,7 +55,11 @@ export function VolunteerShell({
               >
                 {onDuty ? "● On Duty" : "Off Duty"}
               </span>
-              <button type="button" onClick={() => onTabChange("profile")} aria-label="Open profile">
+              <button
+                type="button"
+                onClick={() => onTabChange("profile")}
+                aria-label="Open profile"
+              >
                 <Avatar className="h-9 w-9" />
               </button>
             </div>

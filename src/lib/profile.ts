@@ -21,7 +21,7 @@ function migrateLocalStorage() {
     "lifeline-user": "aegis-user",
     "lifeline-profile": "aegis-profile",
     "lifeline-auth": "aegis-auth",
-    "auth": "aegis-auth",
+    auth: "aegis-auth",
   };
 
   Object.entries(migrations).forEach(([oldKey, newKey]) => {
@@ -38,24 +38,20 @@ migrateLocalStorage();
 
 function normalizeProfile(role: string, profile: Profile): Profile {
   if (!profile) return {};
-  
+
   // Extract and normalize name values
-  const nameVal = 
-    profile.fullName || 
-    profile.driverName || 
-    profile.hospitalName || 
-    profile.officerName || 
-    profile.operatorName || 
-    profile.name || 
+  const nameVal =
+    profile.fullName ||
+    profile.driverName ||
+    profile.hospitalName ||
+    profile.officerName ||
+    profile.operatorName ||
+    profile.name ||
     "";
   profile.name = nameVal;
-  
+
   // Extract and normalize phone values
-  const phoneVal = 
-    profile.mobileNumber || 
-    profile.emergencyNumber || 
-    profile.phone || 
-    "";
+  const phoneVal = profile.mobileNumber || profile.emergencyNumber || profile.phone || "";
   profile.phone = phoneVal;
 
   // Sync role-specific fields
@@ -82,7 +78,7 @@ function normalizeProfile(role: string, profile: Profile): Profile {
       profile.emergencyContacts = `${profile.emergencyName} (${profile.emergencyRelationship || ""}) - ${profile.emergencyNumber || ""}`;
     }
   }
-  
+
   return profile;
 }
 
@@ -115,7 +111,7 @@ export function getProfile(role: string): Profile {
     const userId = getUserId();
     const key = userId ? `${PREFIX}${userId}` : `${PREFIX}${role}`;
     const raw = localStorage.getItem(key);
-    
+
     if (!raw) {
       // Fallback: Populate details from the currently logged-in user session
       const rawUser = localStorage.getItem("aegis_user");
@@ -137,7 +133,7 @@ export function getProfile(role: string): Profile {
               return normalizeProfile(role, fallbackProfile);
             }
           }
-          
+
           const fallbackProfile = {
             name: user.name || "",
             email: user.email || "",
@@ -158,15 +154,15 @@ export function saveProfile(role: string, data: Profile) {
   try {
     const userId = getUserId();
     const key = userId ? `${PREFIX}${userId}` : `${PREFIX}${role}`;
-    
+
     // Retrieve the existing profile to merge updates and prevent loss of other fields
     const existing = getProfile(role);
     const merged = { ...existing, ...data };
-    
+
     // Normalize fields before writing
     const normalized = normalizeProfile(role, merged);
     localStorage.setItem(key, JSON.stringify(normalized));
-    
+
     // Proactively update the current logged-in user session details
     const rawUser = localStorage.getItem("aegis_user");
     if (rawUser) {
@@ -176,7 +172,7 @@ export function saveProfile(role: string, data: Profile) {
         user.email = normalized.email || user.email;
         user.mobileNumber = normalized.phone || user.mobileNumber;
         localStorage.setItem("aegis_user", JSON.stringify(user));
-        
+
         // Also update in the mock users database
         const mockUsersRaw = localStorage.getItem("aegis_mock_users");
         if (mockUsersRaw) {

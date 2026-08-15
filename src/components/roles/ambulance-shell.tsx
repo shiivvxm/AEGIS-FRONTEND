@@ -34,7 +34,10 @@ export function AmbulanceShell({
   const profile = getProfile("ambulance");
   const driverName = getDisplayName("ambulance", user);
   const unitCode = profile.ambulanceNumber || "Unit A-1083";
-  const vehicleType = profile.vehicleType?.includes("ALS") || profile.vehicleType?.includes("Advanced") ? "ALS" : "BLS";
+  const vehicleType =
+    profile.vehicleType?.includes("ALS") || profile.vehicleType?.includes("Advanced")
+      ? "ALS"
+      : "BLS";
 
   return (
     <div className="flex min-h-screen flex-col bg-[#111111]/5">
@@ -45,7 +48,9 @@ export function AmbulanceShell({
               <Ambulance className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-sm font-bold">{unitCode} · {vehicleType}</div>
+              <div className="text-sm font-bold">
+                {unitCode} · {vehicleType}
+              </div>
               <div className="text-[10px] text-white/60">EMT {driverName}</div>
             </div>
           </Link>
@@ -66,7 +71,9 @@ export function AmbulanceShell({
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
                   "flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition-colors",
-                  active ? "border-[#E63946] text-white" : "border-transparent text-white/50 hover:text-white/80",
+                  active
+                    ? "border-[#E63946] text-white"
+                    : "border-transparent text-white/50 hover:text-white/80",
                 )}
               >
                 <tab.icon className="h-3.5 w-3.5" />

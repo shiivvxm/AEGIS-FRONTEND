@@ -44,14 +44,15 @@ const trafficSchema = z
     badgeId: z.string().min(2, "Badge / Officer ID is required"),
     idUpload: z
       .any()
-      .refine((val) => val !== null && val !== undefined && val !== "", "Official Identification document is required"),
-    emergencyContact: z.string().regex(/^[0-9]{10}$/, "Emergency contact number must be exactly 10 digits"),
-    authorizedConsent: z
-      .boolean()
-      .refine((val) => val === true, "You must confirm authorization"),
-    policyConsent: z
-      .boolean()
-      .refine((val) => val === true, "You must agree to AEGIS policies"),
+      .refine(
+        (val) => val !== null && val !== undefined && val !== "",
+        "Official Identification document is required",
+      ),
+    emergencyContact: z
+      .string()
+      .regex(/^[0-9]{10}$/, "Emergency contact number must be exactly 10 digits"),
+    authorizedConsent: z.boolean().refine((val) => val === true, "You must confirm authorization"),
+    policyConsent: z.boolean().refine((val) => val === true, "You must agree to AEGIS policies"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -159,9 +160,7 @@ function TrafficFileUpload({
           <p className="text-xs font-bold text-gray-700">
             Click to <span className="text-[#E63946] underline">Upload Identification</span>
           </p>
-          <p className="text-[10px] text-gray-400 mt-1 font-medium">
-            PDF, PNG, JPG (max 5MB)
-          </p>
+          <p className="text-[10px] text-gray-400 mt-1 font-medium">PDF, PNG, JPG (max 5MB)</p>
         </button>
       )}
     </div>
@@ -311,11 +310,16 @@ function TrafficRegister() {
               </div>
               <div>
                 <h2 className="text-2xl font-extrabold text-gray-900">Account Created</h2>
-                <p className="text-sm text-gray-500 mt-1">Connecting profile to AEGIS Traffic Operations Grid...</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Connecting profile to AEGIS Traffic Operations Grid...
+                </p>
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#E63946] animate-pulse rounded-full" style={{ width: "90%" }} />
+                  <div
+                    className="h-full bg-[#E63946] animate-pulse rounded-full"
+                    style={{ width: "90%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -357,7 +361,9 @@ function TrafficRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
                     {errors.fullName?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.fullName.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.fullName.message)}
+                      </p>
                     )}
                   </div>
 
@@ -372,7 +378,9 @@ function TrafficRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
                     {errors.email?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.email.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.email.message)}
+                      </p>
                     )}
                   </div>
 
@@ -393,7 +401,9 @@ function TrafficRegister() {
                       />
                     </div>
                     {errors.mobileNumber?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.mobileNumber.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.mobileNumber.message)}
+                      </p>
                     )}
                   </div>
 
@@ -402,18 +412,29 @@ function TrafficRegister() {
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         Password
                       </label>
-                      <PasswordInput showStrength {...register("password")} placeholder="Enter password" />
+                      <PasswordInput
+                        showStrength
+                        {...register("password")}
+                        placeholder="Enter password"
+                      />
                       {errors.password?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.password.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.password.message)}
+                        </p>
                       )}
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         Confirm Password
                       </label>
-                      <PasswordInput {...register("confirmPassword")} placeholder="Confirm password" />
+                      <PasswordInput
+                        {...register("confirmPassword")}
+                        placeholder="Confirm password"
+                      />
                       {errors.confirmPassword?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.confirmPassword.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.confirmPassword.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -435,7 +456,9 @@ function TrafficRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                       />
                       {errors.officerId?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.officerId.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.officerId.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -454,7 +477,9 @@ function TrafficRegister() {
                         ))}
                       </select>
                       {errors.designation?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.designation.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.designation.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -470,7 +495,9 @@ function TrafficRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
                     {errors.trafficUnit?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.trafficUnit.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.trafficUnit.message)}
+                      </p>
                     )}
                   </div>
 
@@ -485,7 +512,9 @@ function TrafficRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
                     {errors.controlCenter?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.controlCenter.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.controlCenter.message)}
+                      </p>
                     )}
                   </div>
 
@@ -506,7 +535,9 @@ function TrafficRegister() {
                         ))}
                       </select>
                       {errors.zone?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.zone.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.zone.message)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -520,7 +551,9 @@ function TrafficRegister() {
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                       />
                       {errors.city?.message && (
-                        <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.city.message)}</p>
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {String(errors.city.message)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -541,7 +574,9 @@ function TrafficRegister() {
                       ))}
                     </select>
                     {errors.dutyShift?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.dutyShift.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.dutyShift.message)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -561,7 +596,9 @@ function TrafficRegister() {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
                     {errors.badgeId?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.badgeId.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.badgeId.message)}
+                      </p>
                     )}
                   </div>
 
@@ -578,7 +615,9 @@ function TrafficRegister() {
                       )}
                     />
                     {errors.idUpload?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.idUpload.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.idUpload.message)}
+                      </p>
                     )}
                   </div>
 
@@ -599,7 +638,9 @@ function TrafficRegister() {
                       />
                     </div>
                     {errors.emergencyContact?.message && (
-                      <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {String(errors.emergencyContact.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {String(errors.emergencyContact.message)}
+                      </p>
                     )}
                   </div>
 
@@ -615,7 +656,9 @@ function TrafficRegister() {
                       </span>
                     </label>
                     {errors.authorizedConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.authorizedConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.authorizedConsent.message)}
+                      </p>
                     )}
 
                     <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/60 transition-colors">
@@ -629,7 +672,9 @@ function TrafficRegister() {
                       </span>
                     </label>
                     {errors.policyConsent?.message && (
-                      <p className="text-[10px] text-red-500 font-bold">⚠️ {String(errors.policyConsent.message)}</p>
+                      <p className="text-[10px] text-red-500 font-bold">
+                        ⚠️ {String(errors.policyConsent.message)}
+                      </p>
                     )}
                   </div>
                 </div>

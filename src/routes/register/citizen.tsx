@@ -11,41 +11,46 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/register/citizen")({
   head: () => ({
-    meta: [{ title: "Citizen Registration · AEGIS" }]
+    meta: [{ title: "Citizen Registration · AEGIS" }],
   }),
   component: CitizenRegister,
 });
 
-const citizenSchema = z.object({
-  fullName: z.string().min(2, "Full Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  mobileNumber: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
-  confirmPassword: z.string(),
-  dob: z.string().min(1, "Date of Birth is required"),
-  gender: z.string().min(1, "Please select your gender"),
-  bloodGroup: z.string().min(1, "Please select your blood group"),
-  address: z.string().min(5, "Address must be at least 5 characters"),
-  city: z.string().min(2, "City must be at least 2 characters"),
-  state: z.string().min(2, "State is required"),
-  pincode: z.string().regex(/^[0-9]{6}$/, "Pincode must be exactly 6 digits"),
-  emergencyName: z.string().min(2, "Contact Name must be at least 2 characters"),
-  emergencyNumber: z.string().regex(/^[0-9]{10}$/, "Emergency number must be exactly 10 digits"),
-  emergencyRelationship: z.string().min(1, "Please select contact relationship"),
-  medicalConditions: z.string().optional(),
-  allergies: z.string().optional(),
-  aadhaarNumber: z.string().optional(),
-  organDonor: z.string().optional(),
-  consent: z.boolean().refine((val) => val === true, "You must consent to emergency data sharing"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const citizenSchema = z
+  .object({
+    fullName: z.string().min(2, "Full Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    mobileNumber: z.string().regex(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
+    confirmPassword: z.string(),
+    dob: z.string().min(1, "Date of Birth is required"),
+    gender: z.string().min(1, "Please select your gender"),
+    bloodGroup: z.string().min(1, "Please select your blood group"),
+    address: z.string().min(5, "Address must be at least 5 characters"),
+    city: z.string().min(2, "City must be at least 2 characters"),
+    state: z.string().min(2, "State is required"),
+    pincode: z.string().regex(/^[0-9]{6}$/, "Pincode must be exactly 6 digits"),
+    emergencyName: z.string().min(2, "Contact Name must be at least 2 characters"),
+    emergencyNumber: z.string().regex(/^[0-9]{10}$/, "Emergency number must be exactly 10 digits"),
+    emergencyRelationship: z.string().min(1, "Please select contact relationship"),
+    medicalConditions: z.string().optional(),
+    allergies: z.string().optional(),
+    aadhaarNumber: z.string().optional(),
+    organDonor: z.string().optional(),
+    consent: z
+      .boolean()
+      .refine((val) => val === true, "You must consent to emergency data sharing"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type CitizenFormData = z.infer<typeof citizenSchema>;
 
@@ -67,7 +72,7 @@ function CitizenRegister() {
     mode: "onChange",
     defaultValues: {
       consent: false,
-    }
+    },
   });
 
   const nextStep = async () => {
@@ -117,10 +122,13 @@ function CitizenRegister() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F9FB] relative overflow-hidden font-sans">
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-red-500/[0.02] to-transparent pointer-events-none" />
-      
+
       <div className="w-full max-w-lg relative z-10 space-y-6">
         <div className="flex justify-between items-center">
-          <Link to="/register" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 font-bold transition-colors">
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 font-bold transition-colors"
+          >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Roles
           </Link>
           <div className="flex items-center gap-2">
@@ -139,11 +147,16 @@ function CitizenRegister() {
               </div>
               <div>
                 <h2 className="text-2xl font-extrabold text-gray-900">Account Created</h2>
-                <p className="text-sm text-gray-500 mt-1">Connecting your profile to Noida Metro Emergency Dispatch...</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Connecting your profile to Noida Metro Emergency Dispatch...
+                </p>
               </div>
               <div className="flex justify-center pt-2">
                 <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#E63946] animate-pulse rounded-full" style={{ width: "90%" }} />
+                  <div
+                    className="h-full bg-[#E63946] animate-pulse rounded-full"
+                    style={{ width: "90%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -171,31 +184,47 @@ function CitizenRegister() {
               {step === 1 && (
                 <div className="space-y-4 animate-fade-in">
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Full Name</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Full Name
+                    </label>
                     <input
                       type="text"
                       {...register("fullName")}
                       placeholder="Aarav Sharma"
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
-                    {errors.fullName && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.fullName.message}</p>}
+                    {errors.fullName && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {errors.fullName.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Email Address
+                    </label>
                     <input
                       type="email"
                       {...register("email")}
                       placeholder="aarav@gmail.com"
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
-                    {errors.email && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.email.message}</p>}
+                    {errors.email && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {errors.email.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Mobile Number</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Mobile Number
+                    </label>
                     <div className="flex gap-2">
-                      <span className="inline-flex items-center px-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">+91</span>
+                      <span className="inline-flex items-center px-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-500">
+                        +91
+                      </span>
                       <input
                         type="tel"
                         maxLength={10}
@@ -204,26 +233,39 @@ function CitizenRegister() {
                         className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                       />
                     </div>
-                    {errors.mobileNumber && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.mobileNumber.message}</p>}
+                    {errors.mobileNumber && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {errors.mobileNumber.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Password</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Password
+                      </label>
                       <PasswordInput
                         showStrength
                         {...register("password")}
                         placeholder="••••••••"
                       />
-                      {errors.password && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.password.message}</p>}
+                      {errors.password && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.password.message}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Confirm Password</label>
-                      <PasswordInput
-                        {...register("confirmPassword")}
-                        placeholder="••••••••"
-                      />
-                      {errors.confirmPassword && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.confirmPassword.message}</p>}
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Confirm Password
+                      </label>
+                      <PasswordInput {...register("confirmPassword")} placeholder="••••••••" />
+                      {errors.confirmPassword && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.confirmPassword.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -234,16 +276,24 @@ function CitizenRegister() {
                 <div className="space-y-4 animate-fade-in">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Date of Birth</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Date of Birth
+                      </label>
                       <input
                         type="date"
                         {...register("dob")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all bg-white"
                       />
-                      {errors.dob && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.dob.message}</p>}
+                      {errors.dob && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.dob.message}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Gender</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Gender
+                      </label>
                       <select
                         {...register("gender")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all bg-white"
@@ -253,44 +303,68 @@ function CitizenRegister() {
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </select>
-                      {errors.gender && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.gender.message}</p>}
+                      {errors.gender && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.gender.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Complete Address</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      Complete Address
+                    </label>
                     <textarea
                       rows={2}
                       {...register("address")}
                       placeholder="Flat 304, Block B, Amrapali Silicon Valley"
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                     />
-                    {errors.address && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.address.message}</p>}
+                    {errors.address && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {errors.address.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="col-span-1">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">State</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        State
+                      </label>
                       <input
                         type="text"
                         {...register("state")}
                         placeholder="UP"
                         className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:border-[#E63946] focus:outline-none"
                       />
-                      {errors.state && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.state.message}</p>}
+                      {errors.state && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.state.message}
+                        </p>
+                      )}
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">City</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        City
+                      </label>
                       <input
                         type="text"
                         {...register("city")}
                         placeholder="Noida"
                         className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:border-[#E63946] focus:outline-none"
                       />
-                      {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.city.message}</p>}
+                      {errors.city && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.city.message}
+                        </p>
+                      )}
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Pincode</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Pincode
+                      </label>
                       <input
                         type="text"
                         maxLength={6}
@@ -298,13 +372,19 @@ function CitizenRegister() {
                         placeholder="201301"
                         className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:border-[#E63946] focus:outline-none"
                       />
-                      {errors.pincode && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.pincode.message}</p>}
+                      {errors.pincode && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.pincode.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aadhaar Number (Optional)</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Aadhaar Number (Optional)
+                      </label>
                       <input
                         type="text"
                         maxLength={12}
@@ -314,7 +394,9 @@ function CitizenRegister() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Organ Donor Status</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Organ Donor Status
+                      </label>
                       <select
                         {...register("organDonor")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all bg-white"
@@ -332,7 +414,9 @@ function CitizenRegister() {
                 <div className="space-y-4 animate-fade-in">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Blood Group</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Blood Group
+                      </label>
                       <select
                         {...register("bloodGroup")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all bg-white"
@@ -347,10 +431,16 @@ function CitizenRegister() {
                         <option value="AB+">AB+</option>
                         <option value="AB-">AB-</option>
                       </select>
-                      {errors.bloodGroup && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.bloodGroup.message}</p>}
+                      {errors.bloodGroup && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.bloodGroup.message}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Emergency Contact Relationship</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Emergency Contact Relationship
+                      </label>
                       <select
                         {...register("emergencyRelationship")}
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all bg-white"
@@ -363,23 +453,35 @@ function CitizenRegister() {
                         <option value="Friend">Friend</option>
                         <option value="Other">Other</option>
                       </select>
-                      {errors.emergencyRelationship && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.emergencyRelationship.message}</p>}
+                      {errors.emergencyRelationship && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.emergencyRelationship.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Emergency Contact Name</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Emergency Contact Name
+                      </label>
                       <input
                         type="text"
                         {...register("emergencyName")}
                         placeholder="Priya Sharma"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                       />
-                      {errors.emergencyName && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.emergencyName.message}</p>}
+                      {errors.emergencyName && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.emergencyName.message}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Emergency Mobile Number</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Emergency Mobile Number
+                      </label>
                       <input
                         type="tel"
                         maxLength={10}
@@ -387,13 +489,19 @@ function CitizenRegister() {
                         placeholder="9876543211"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-[#E63946] focus:ring-2 focus:ring-[#E63946]/10 focus:outline-none transition-all"
                       />
-                      {errors.emergencyNumber && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.emergencyNumber.message}</p>}
+                      {errors.emergencyNumber && (
+                        <p className="text-[10px] text-red-500 font-bold mt-1">
+                          ⚠️ {errors.emergencyNumber.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Known Allergies (Optional)</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Known Allergies (Optional)
+                      </label>
                       <input
                         type="text"
                         {...register("allergies")}
@@ -402,7 +510,9 @@ function CitizenRegister() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Chronic Illnesses / Conditions (Optional)</label>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Chronic Illnesses / Conditions (Optional)
+                      </label>
                       <input
                         type="text"
                         {...register("medicalConditions")}
@@ -420,10 +530,16 @@ function CitizenRegister() {
                         className="rounded mt-1 text-primary focus:ring-primary h-4 w-4"
                       />
                       <span className="text-[10px] leading-relaxed text-gray-500 font-semibold uppercase tracking-wide">
-                        I hereby authorize AEGIS to share my blood group, chronic conditions, and emergency contacts with ambulance paramedics and hospital trauma coordinators during active SOS states.
+                        I hereby authorize AEGIS to share my blood group, chronic conditions, and
+                        emergency contacts with ambulance paramedics and hospital trauma
+                        coordinators during active SOS states.
                       </span>
                     </label>
-                    {errors.consent && <p className="text-[10px] text-red-500 font-bold mt-1">⚠️ {errors.consent.message}</p>}
+                    {errors.consent && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1">
+                        ⚠️ {errors.consent.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

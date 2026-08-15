@@ -3,8 +3,7 @@ import { Eye, EyeOff, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
-export interface PasswordInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   showStrength?: boolean;
 }
 
@@ -27,7 +26,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     const getStrength = (pass: string) => {
       let score = 0;
       if (!pass) return { score, text: "Weak", color: "bg-gray-200" };
-      
+
       if (pass.length >= 8) score++;
       if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score++;
       if (/[0-9]/.test(pass)) score++;
@@ -70,12 +69,14 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           <div className="space-y-1.5 animate-fade-in">
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-500">
               <span>Password Strength</span>
-              <span className={cn(
-                strength.score <= 1 && "text-red-500",
-                strength.score === 2 && "text-amber-500",
-                strength.score === 3 && "text-blue-500",
-                strength.score === 4 && "text-green-500"
-              )}>
+              <span
+                className={cn(
+                  strength.score <= 1 && "text-red-500",
+                  strength.score === 2 && "text-amber-500",
+                  strength.score === 3 && "text-blue-500",
+                  strength.score === 4 && "text-green-500",
+                )}
+              >
                 {strength.text}
               </span>
             </div>
@@ -85,12 +86,12 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
                   key={i}
                   className={cn(
                     "h-full flex-1 transition-all duration-300",
-                    i < strength.score ? strength.color : "bg-gray-100"
+                    i < strength.score ? strength.color : "bg-gray-100",
                   )}
                 />
               ))}
             </div>
-            
+
             <ul className="text-[10px] text-gray-400 space-y-0.5 mt-1 font-medium">
               <li className="flex items-center gap-1">
                 {password.length >= 8 ? (
@@ -129,6 +130,6 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
         )}
       </div>
     );
-  }
+  },
 );
 PasswordInput.displayName = "PasswordInput";

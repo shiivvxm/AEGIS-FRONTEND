@@ -158,7 +158,7 @@ export function FileUpload({
           "relative flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-center cursor-pointer transition-all hover:bg-gray-50/50 hover:border-gray-300",
           dragActive && "border-primary bg-primary/5",
           error && "border-red-400 bg-red-50/20",
-          fileName && "border-solid border-green-200 bg-green-50/10"
+          fileName && "border-solid border-green-200 bg-green-50/10",
         )}
       >
         <input

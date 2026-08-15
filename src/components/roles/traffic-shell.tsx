@@ -48,27 +48,32 @@ export function TrafficShell({
   const name = getDisplayName("traffic", user);
   const badgeId = profile.employeeId || "TRF-9021";
 
+  const initials = name
+    ? name
+        .split(" ")
+        .map((s) => s[0])
+        .slice(0, 2)
+        .join("")
+    : "TR";
+
   return (
-    <div className="flex min-h-screen bg-[#080C14] text-white">
+    <div className="flex min-h-screen bg-[#F8F9FB]">
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col border-r border-[#242E42] bg-[#0D1220] p-4 w-[280px]">
-        <div className="mb-6 flex items-center justify-between">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-[#E5E7EB] bg-white lg:flex">
+        <div className="border-b border-[#E5E7EB] px-5 py-4">
           <AegisBrand to="/traffic" />
-        </div>
-
-        <div className="mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">
-              Traffic Control Active
-            </span>
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-100 p-2.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div>
+              <div className="text-xs font-bold text-gray-900">Traffic Grid Active</div>
+              <div className="text-[10px] text-blue-700 font-semibold">
+                {activeCorridorsCount} Corridors Synced
+              </div>
+            </div>
           </div>
-          <p className="text-[10px] text-gray-400 mt-1 font-medium">
-            {activeCorridorsCount} Emergency Corridors Locked
-          </p>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1.5">
+        <nav className="flex-1 space-y-0.5 p-3">
           {TABS.map((t) => {
             const isActive = activeTab === t.id;
             return (
@@ -77,16 +82,18 @@ export function TrafficShell({
                 type="button"
                 onClick={() => onTabChange(t.id)}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-bold transition-all",
+                  "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors cursor-pointer",
                   isActive
-                    ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-sm"
-                    : "text-gray-400 hover:bg-[#161D2D] hover:text-white border border-transparent",
+                    ? "bg-blue-600/10 font-bold text-blue-700"
+                    : "text-gray-600 hover:bg-[#F8F9FB] hover:text-gray-900 font-medium",
                 )}
               >
-                <t.icon className={cn("h-4 w-4", isActive ? "text-emerald-400" : "text-gray-400")} />
-                <span className="flex-1">{t.label}</span>
+                <t.icon
+                  className={cn("h-4 w-4 shrink-0", isActive ? "text-blue-600" : "text-gray-400")}
+                />
+                <span className="flex-1 truncate">{t.label}</span>
                 {t.id === "corridors" && activeCorridorsCount > 0 && (
-                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-extrabold text-emerald-400">
+                  <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[9px] font-extrabold">
                     {activeCorridorsCount}
                   </span>
                 )}
@@ -95,22 +102,24 @@ export function TrafficShell({
           })}
         </nav>
 
-        <div className="mt-4 pt-3 border-t border-[#242E42] space-y-2">
+        <div className="p-3 border-t border-[#E5E7EB] space-y-2">
           <button
             type="button"
             onClick={() => onTabChange("profile")}
-            className="flex w-full items-center gap-3 rounded-xl bg-[#161D2D]/60 p-2.5 text-left ring-1 ring-[#242E42] hover:bg-[#161D2D] transition-colors"
+            className="flex w-full items-center gap-2.5 rounded-xl bg-gray-50 p-2.5 text-left border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
           >
-            <Avatar className="h-8 w-8 ring-2 ring-emerald-500/40" />
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-blue-600/10 text-xs font-black text-blue-700">
+              {initials}
+            </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-white truncate">{name}</div>
-              <div className="text-[9px] text-emerald-400 font-mono font-semibold">{badgeId}</div>
+              <div className="text-xs font-bold text-gray-900 truncate">{name}</div>
+              <div className="text-[9px] text-gray-500 font-mono font-semibold">{badgeId}</div>
             </div>
           </button>
           <button
             type="button"
             onClick={logout}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/5 py-2 text-[10px] font-bold text-red-400 hover:bg-red-500/10 transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2 text-[10px] font-bold text-red-700 hover:bg-red-100 transition-colors cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" /> Log Out Portal
           </button>
@@ -118,62 +127,50 @@ export function TrafficShell({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col min-w-0">
-        <header className="sticky top-0 z-20 border-b border-[#242E42] bg-[#0D1220]/95 px-4 py-3 backdrop-blur-md">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AegisBrand compact to="/traffic" />
-              <div className="hidden sm:block text-xs font-bold text-white tracking-wide uppercase border-l border-[#242E42] pl-3">
-                AEGIS Traffic Operations Grid
-              </div>
+      <div className="flex flex-1 flex-col lg:pl-56">
+        <header className="sticky top-0 z-20 border-b border-[#E5E7EB] bg-white px-4 py-3 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-lg font-bold text-[#111111]">AEGIS Traffic Operations Grid</h1>
+              <p className="text-xs text-[#525866]">Emergency Traffic Management Portal</p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-[10px] font-extrabold text-emerald-400">
-                ● Live Signals Synced
+              <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[10px] font-extrabold text-emerald-700 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Signals Synced
               </span>
               <button
                 type="button"
                 onClick={() => onTabChange("profile")}
-                className="lg:hidden"
                 aria-label="Open profile"
+                className="cursor-pointer"
               >
-                <Avatar className="h-8 w-8 ring-2 ring-emerald-500/40" />
+                <div className="grid h-9 w-9 place-items-center rounded-full bg-blue-600/10 text-xs font-black text-blue-700">
+                  {initials}
+                </div>
               </button>
             </div>
           </div>
+
+          {/* Mobile Navigation Pills */}
+          <div className="mt-3 flex gap-1 overflow-x-auto lg:hidden">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => onTabChange(t.id)}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1 text-xs font-semibold cursor-pointer",
+                  activeTab === t.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600",
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#080C14] pb-24 lg:pb-6">{children}</main>
-
-        {/* Mobile Navigation Bar */}
-        <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[#242E42] bg-[#0D1220]/95 backdrop-blur-md lg:hidden">
-          <div className="flex w-full items-stretch justify-around px-2 py-1.5">
-            {TABS.map((tab) => {
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => onTabChange(tab.id)}
-                  className={cn(
-                    "flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[9px] font-extrabold transition-colors",
-                    active ? "text-emerald-400" : "text-gray-400",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "grid h-8 w-8 place-items-center rounded-xl transition-all",
-                      active ? "bg-emerald-500/20 text-emerald-400" : "bg-transparent",
-                    )}
-                  >
-                    <tab.icon className="h-4 w-4" />
-                  </span>
-                  <span className="truncate max-w-full">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+        <main className="flex-1 p-4 lg:p-8 bg-[#F8F9FB]">{children}</main>
       </div>
     </div>
   );

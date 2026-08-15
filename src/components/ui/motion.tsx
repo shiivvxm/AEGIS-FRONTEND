@@ -15,7 +15,14 @@ const staggerVariants: Variants = {
   enter: { opacity: 1, y: 0 },
 };
 
-export function PageMotion({ children, className, ...props }: { children: ReactNode; className?: string }) {
+export function PageMotion({
+  children,
+  className,
+  ...props
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <motion.div
       initial="hidden"
@@ -30,9 +37,22 @@ export function PageMotion({ children, className, ...props }: { children: ReactN
   );
 }
 
-export function Stagger({ children, className, ...props }: { children: ReactNode; className?: string }) {
+export function Stagger({
+  children,
+  className,
+  ...props
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <motion.div variants={staggerVariants} initial="hidden" animate="enter" className={className} {...(props as ComponentProps<"div">)}>
+    <motion.div
+      variants={staggerVariants}
+      initial="hidden"
+      animate="enter"
+      className={className}
+      {...(props as ComponentProps<"div">)}
+    >
       {children}
     </motion.div>
   );
